@@ -23,33 +23,36 @@ export default function Compteur() {
     return () => clearInterval(t);
   }, []);
 
-  if (reste === null) {
-    return <div className="bulles" aria-hidden="true" style={{ minHeight: 102 }} />;
-  }
-
-  if (reste <= 0) {
+  if (reste !== null && reste <= 0) {
     return (
-      <div className="bulles">
-        <div className="bulle bulle--seule">
-          <b style={{ fontSize: "1.5rem" }}>C’est ce soir</b>
-        </div>
+      <div className="compte">
+        <p className="compte__titre">Le 12 novembre</p>
+        <p className="compte__cesoir">C’est ce soir.</p>
       </div>
     );
   }
 
-  let restant = reste;
+  const valeurs = UNITES.map(([nom, ms], i) => {
+    const total = Math.floor((reste ?? 0) / ms);
+    // Les heures, minutes et secondes ne gardent que ce qui reste de l’unité au-dessus
+    const v = i === 0 ? total : total % (UNITES[i - 1][1] / ms);
+    return { nom, texte: reste === null ? "–" : String(v).padStart(i === 0 ? 1 : 2, "0") };
+  });
+
   return (
-    <div className="bulles">
-      {UNITES.map(([nom, ms]) => {
-        const v = Math.floor(restant / ms);
-        restant -= v * ms;
-        return (
-          <div className="bulle" key={nom}>
-            <b>{v}</b>
-            <span>{nom}</span>
-          </div>
-        );
-      })}
+    <div className="compte" role="timer" aria-label="Temps avant la soirée">
+      <p className="compte__titre">Avant de se retrouver</p>
+      <div className="compte__cases">
+        {valeurs.map(({ nom, texte }) => {
+          return (
+            <div className="compte__case" key={nom}>
+              {/* La clé change à chaque seconde : le chiffre se renouvelle en douceur */}
+              <b key={texte}>{texte}</b>
+              <span>{nom}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

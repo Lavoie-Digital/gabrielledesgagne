@@ -1,8 +1,13 @@
 /* =========================================================================
    POUR CLÉMENT : FICHIER DE DONNÉES
+
+   ⚠ Les lots et les commanditaires se gèrent maintenant dans l’espace
+   privé du site (/admin), et sont enregistrés dans Firestore.
+   Ceux écrits plus bas servent seulement :
+     - d’exemples, importables d’un clic depuis l’espace privé ;
+     - de solution de repli si Firestore est vide ou injoignable.
+   La configuration générale (liens, date, billet) reste ici.
    -------------------------------------------------------------------------
-   C’est le SEUL fichier à modifier pour faire vivre le site au quotidien :
-   les liens de paiement, les lots de l’encan et les commanditaires.
 
    Règles de base :
    - Le texte va toujours entre guillemets droits : "comme ceci"
@@ -39,6 +44,16 @@ export const CONFIG = {
     telephone: "418 929-8579",
   },
 
+  /* --- Protection des renseignements personnels (Loi 25) ---
+     La personne responsable doit être nommée publiquement. Par défaut, la
+     loi désigne la personne qui a la plus haute autorité : l’organisatrice. */
+  confidentialite: {
+    responsable: "Gabrielle Desgagné",
+    titre: "Organisatrice de la soirée et responsable de la protection des renseignements personnels",
+    courriel: "gabrielledesg@hotmail.com",
+    miseAJour: "18 octobre 2026",
+  },
+
   /* --- Le billet --- */
   billet: {
     prix: 150,
@@ -72,7 +87,7 @@ export const CONFIG = {
   /* --- L’encan --- */
   encan: {
     ouvert: false,                    // true quand les mises sont ouvertes
-    messageFerme: "L’encan en ligne ouvrira quelques jours avant la soirée. Les lots sont déjà confirmés, revenez bientôt pour déposer votre mise.",
+    messageFerme: "L’encan en ligne ouvrira quelques jours avant la soirée. Revenez bientôt pour découvrir les lots et déposer votre mise.",
 
     /* -------------------------------------------------------------------
        AFFICHAGE EN DIRECT (page /direct, celle du soir de la soirée)
@@ -124,6 +139,7 @@ export const CONFIG = {
      mot    courte description (facultatif)
    ------------------------------------------------------------------------- */
 export type Commanditaire = {
+  id?: string;          // identifiant Firestore (rempli automatiquement)
   nom: string;
   logo: string;
   url: string;
@@ -171,21 +187,12 @@ export const COMMANDITAIRES: {
 /* -------------------------------------------------------------------------
    3. LES LOTS DE L’ENCAN
    -------------------------------------------------------------------------
-   Les 20 lots ci-dessous sont des EXEMPLES. Remplacez-les par les vôtres.
+   Les lots se gèrent dans l’espace privé (/admin). La liste plus bas est
+   vide : tant qu’aucun lot n’est ajouté, le site annonce que les lots
+   seront dévoilés bientôt.
 
-   Pour chaque lot :
-     titre        le nom du lot
-     categorie    doit correspondre à une des catégories listées plus bas
-     donateur     l’entreprise qui offre le lot
-     description  2 ou 3 phrases
-     valeur       valeur au détail, en dollars (nombre)
-     miseDepart   mise de départ, en dollars (nombre)
-     miseActuelle mise la plus élevée reçue (mettez la même valeur que
-                  miseDepart tant que personne n’a misé)
-     nbMises      nombre de mises reçues
-     image        photo déposée dans « public », ex. "/lot-01.jpg"
-                  (laissez "" : le site affiche une vignette élégante)
-     lienMise     lien pour miser sur CE lot en particulier (facultatif)
+   Les catégories ci-dessous alimentent la liste déroulante de l’espace
+   privé et les filtres de la page des prix.
    ------------------------------------------------------------------------- */
 export const CATEGORIES = [
   "Séjours et évasion",
@@ -198,6 +205,7 @@ export const CATEGORIES = [
 ];
 
 export type Lot = {
+  id?: string;          // identifiant Firestore (rempli automatiquement)
   titre: string;
   categorie: string;
   donateur: string;
@@ -207,150 +215,15 @@ export type Lot = {
   miseActuelle: number;
   nbMises: number;
   image: string;
+  // « entier » : l’image est toujours montrée au complet (logos, cartes-cadeaux)
+  // « remplir » : l’image occupe tout le cadre, quitte à rogner les bords (photos)
+  cadrage?: "entier" | "remplir";
   lienMise: string;
 };
 
 export const LOTS: Lot[] = [
-  {
-    titre: "Escapade de deux nuits en Charlevoix",
-    categorie: "Séjours et évasion",
-    donateur: "Nom du commanditaire",
-    description: "Deux nuitées pour deux personnes dans une auberge avec vue sur le fleuve, petits-déjeuners inclus. Valable en toute saison.",
-    valeur: 800, miseDepart: 350, miseActuelle: 350, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Souper gastronomique pour deux",
-    categorie: "Gastronomie",
-    donateur: "Nom du commanditaire",
-    description: "Menu dégustation en sept services avec accords vins, dans une des belles tables de la région.",
-    valeur: 400, miseDepart: 175, miseActuelle: 175, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Journée aux bains nordiques pour deux",
-    categorie: "Bien-être",
-    donateur: "Nom du commanditaire",
-    description: "Accès aux bains, saunas et aires de détente, plus un massage suédois de soixante minutes chacun.",
-    valeur: 320, miseDepart: 140, miseActuelle: 140, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Œuvre originale d’une artiste d’ici",
-    categorie: "Art et décoration",
-    donateur: "Nom du commanditaire",
-    description: "Acrylique sur toile signée, 36 x 48 pouces, encadrée. Une pièce unique offerte par l’artiste pour la soirée.",
-    valeur: 1200, miseDepart: 500, miseActuelle: 500, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Deux billets de hockey, section rouge",
-    categorie: "Sports et plein air",
-    donateur: "Nom du commanditaire",
-    description: "Deux places côte à côte pour un match de la saison régulière, stationnement inclus.",
-    valeur: 600, miseDepart: 275, miseActuelle: 275, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Panier gourmand de producteurs locaux",
-    categorie: "Gastronomie",
-    donateur: "Nom du commanditaire",
-    description: "Fromages fins, charcuteries artisanales, confitures, pain frais et une bouteille de cidre de glace.",
-    valeur: 250, miseDepart: 100, miseActuelle: 100, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Cours de cuisine privé à la maison",
-    categorie: "Gastronomie",
-    donateur: "Nom du commanditaire",
-    description: "Un chef se déplace chez vous pour un atelier de trois heures avec six convives, repas et vins compris.",
-    valeur: 700, miseDepart: 300, miseActuelle: 300, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Vélo hybride tout équipé",
-    categorie: "Sports et plein air",
-    donateur: "Nom du commanditaire",
-    description: "Vélo neuf de taille au choix, avec casque, cadenas et mise au point gratuite la première année.",
-    valeur: 900, miseDepart: 400, miseActuelle: 400, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Séance photo familiale en studio",
-    categorie: "Famille",
-    donateur: "Nom du commanditaire",
-    description: "Une heure de séance, quinze photos retouchées en haute résolution et un album imprimé.",
-    valeur: 450, miseDepart: 175, miseActuelle: 175, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Caisse de douze bouteilles sélectionnées",
-    categorie: "Gastronomie",
-    donateur: "Nom du commanditaire",
-    description: "Une sélection de rouges et de blancs choisie par un sommelier, livrée dans une caisse de bois gravée.",
-    valeur: 600, miseDepart: 250, miseActuelle: 250, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Ronde de golf pour quatre",
-    categorie: "Sports et plein air",
-    donateur: "Nom du commanditaire",
-    description: "Dix-huit trous avec deux voiturettes et un repas au chalet, sur un parcours réputé de la région.",
-    valeur: 550, miseDepart: 225, miseActuelle: 225, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Abonnement annuel d’entraînement",
-    categorie: "Bien-être",
-    donateur: "Nom du commanditaire",
-    description: "Douze mois d’accès illimité, incluant trois rencontres avec un entraîneur personnel.",
-    valeur: 750, miseDepart: 300, miseActuelle: 300, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Croisière d’observation des baleines",
-    categorie: "Séjours et évasion",
-    donateur: "Nom du commanditaire",
-    description: "Excursion de trois heures pour quatre personnes, avec guide naturaliste, sur le Saint-Laurent.",
-    valeur: 500, miseDepart: 200, miseActuelle: 200, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Bijou d’une créatrice québécoise",
-    categorie: "Art et décoration",
-    donateur: "Nom du commanditaire",
-    description: "Collier en argent sterling fait à la main, pièce unique présentée dans son écrin.",
-    valeur: 380, miseDepart: 150, miseActuelle: 150, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Ensemble de literie haut de gamme",
-    categorie: "Art et décoration",
-    donateur: "Nom du commanditaire",
-    description: "Douillette, housse en coton égyptien et deux oreillers de duvet, format très grand lit.",
-    valeur: 450, miseDepart: 175, miseActuelle: 175, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Quatre visites d’entretien ménager",
-    categorie: "Services",
-    donateur: "Nom du commanditaire",
-    description: "Quatre séances de trois heures, à l’horaire qui vous convient, produits écologiques fournis.",
-    valeur: 480, miseDepart: 200, miseActuelle: 200, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Journée guidée en plein air pour deux",
-    categorie: "Sports et plein air",
-    donateur: "Nom du commanditaire",
-    description: "Une journée complète d’aventure encadrée par un guide, équipement et dîner en forêt inclus.",
-    valeur: 550, miseDepart: 225, miseActuelle: 225, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Table d’hôte pour quatre au Vieux-Québec",
-    categorie: "Gastronomie",
-    donateur: "Nom du commanditaire",
-    description: "Quatre menus complets, entrée, plat et dessert, dans une salle à manger historique.",
-    valeur: 700, miseDepart: 300, miseActuelle: 300, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Nuitée en prêt-à-camper",
-    categorie: "Famille",
-    donateur: "Nom du commanditaire",
-    description: "Une nuit en hébergement tout équipé dans un parc national, pour une famille de quatre.",
-    valeur: 400, miseDepart: 160, miseActuelle: 160, nbMises: 0, image: "", lienMise: "",
-  },
-  {
-    titre: "Grand format d’un photographe animalier",
-    categorie: "Art et décoration",
-    donateur: "Nom du commanditaire",
-    description: "Tirage numéroté de 40 x 60 pouces sur papier d’archive, monté sur aluminium et signé.",
-    valeur: 850, miseDepart: 350, miseActuelle: 350, nbMises: 0, image: "", lienMise: "",
-  },
+  // Les vrais lots s’ajoutent dans l’espace privé (/admin > Lots de l’encan).
+  // Cette liste sert seulement de solution de repli si Firestore est injoignable.
 ];
 
 

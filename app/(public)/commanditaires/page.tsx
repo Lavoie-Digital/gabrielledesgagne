@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import EnTete from "@/components/EnTete";
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import {
@@ -6,7 +7,8 @@ import {
   Credit,
   GrilleCommanditaires,
 } from "@/components/Commanditaires";
-import { COMMANDITAIRES, CONFIG } from "@/lib/donnees";
+import { commanditairesPublics } from "@/lib/catalogue";
+import { CONFIG } from "@/lib/donnees";
 
 export const metadata: Metadata = {
   title: "Nos commanditaires",
@@ -45,18 +47,17 @@ const PALIERS = [
   },
 ];
 
-export default function Commanditaires() {
+export default async function Commanditaires() {
+  const COMMANDITAIRES = await commanditairesPublics();
   return (
     <>
-      <section className="pagehead">
-        <div className="wrap">
-          <h1>Nos commanditaires</h1>
-          <p>
-            Sans eux, il n’y a pas de soirée. Voici les entreprises qui ont dit oui, et la façon
-            de les rejoindre.
-          </p>
-        </div>
-      </section>
+      <EnTete
+        surtitre="Ils rendent la soirée possible"
+        titre="Nos commanditaires"
+        texte="Sans eux, il n’y a pas de soirée. Voici les entreprises qui ont dit oui, et la façon de les rejoindre."
+        image="/images/soiree/salle.jpg"
+        alt="Une salle de réception dressée"
+      />
 
       {/* ===== Devenir commanditaire ===== */}
       <section className="section" style={{ paddingBlock: "clamp(2.5rem,5vw,3.5rem)" }}>
@@ -92,7 +93,7 @@ export default function Commanditaires() {
         <div className="wrap">
           <div className="paliers">
             {PALIERS.map((p) => (
-              <div className="palier" key={p.tag}>
+              <div data-reveal className="palier" key={p.tag}>
                 <span className="palier__tag" style={{ color: p.couleur }}>{p.tag}</span>
                 <p className="palier__prix">{p.prix}</p>
                 <p className={"palier__dispo" + (p.epuise ? " palier__dispo--epuise" : "")}>
@@ -169,7 +170,7 @@ export default function Commanditaires() {
       {/* ===== Rappel ===== */}
       <section className="section section--deep">
         <div className="wrap center" style={{ maxWidth: 700 }}>
-          <h2>Merci d’y penser. Cela compte plus qu’on ne peut le dire.</h2>
+          <h2 data-lignes>Merci d’y penser. Cela compte plus qu’on ne peut le dire.</h2>
           <p className="lead" style={{ marginTop: "1.2rem" }}>
             Écrivez-nous et nous trouverons ensemble la formule qui convient à votre entreprise.
           </p>

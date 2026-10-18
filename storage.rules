@@ -1,0 +1,12 @@
+rules_version = '2';
+
+// Les images sont envoyées par le serveur du site (SDK Admin) et affichées
+// grâce à leur lien de téléchargement, qui contient son propre jeton.
+// Aucun accès direct depuis un navigateur n'est nécessaire.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

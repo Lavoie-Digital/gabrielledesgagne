@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import EnTete from "@/components/EnTete";
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import FormulaireDon from "@/components/FormulaireDon";
@@ -23,16 +24,13 @@ export default function Don() {
 
   return (
     <>
-      <section className="pagehead">
-        <div className="wrap">
-          <p className="surtitre">En mémoire de Clément</p>
-          <h1>Faire un don</h1>
-          <p>
-            Vous n’avez pas besoin d’être là le 12 novembre pour faire une différence. Chaque don
-            va directement aux familles qui veillent un enfant au cœur fragile.
-          </p>
-        </div>
-      </section>
+      <EnTete
+        surtitre="En mémoire de Clément"
+        titre="Faire un don"
+        texte="Vous n’avez pas besoin d’être là le 12 novembre pour faire une différence. Chaque don va directement aux familles qui veillent un enfant au cœur fragile."
+        image="/images/clement-coeur.jpg"
+        alt="Le nœud papillon de l’ourson de Clément, et son cœur de cristal"
+      />
 
       <section className="section" id="donner">
         <div className="wrap">
@@ -40,7 +38,7 @@ export default function Don() {
 
             <div>
               <p className="surtitre">Ce que votre don rend possible</p>
-              <h2>Des gestes concrets, tout de suite</h2>
+              <h2 data-lignes>Des gestes concrets, tout de suite</h2>
               <hr className="filet" />
               <p className="lead">
                 La Fondation En Cœur intervient là où le réseau de la santé s’arrête : dans le
@@ -67,7 +65,7 @@ export default function Don() {
                 d’émission des reçus vous seront confirmées au moment de votre don.
               </div>
 
-              <div className="card" style={{ marginTop: "1.6rem" }}>
+              <div data-reveal className="card" style={{ marginTop: "1.6rem" }}>
                 <h3>D’autres façons d’aider</h3>
                 <ul className="liste" style={{ fontSize: ".96rem" }}>
                   <li><Link href="/billets">Réserver un billet</Link> pour la soirée du 12 novembre</li>
@@ -101,7 +99,7 @@ export default function Don() {
           <div className="grid grid--2" style={{ gap: "3rem", alignItems: "center" }}>
             <div>
               <p className="surtitre">À qui va votre don</p>
-              <h2>Fondation En Cœur</h2>
+              <h2 data-lignes>Fondation En Cœur</h2>
               <hr className="filet" />
               <p className="lead">
                 Depuis 1984, la Fondation québécoise pour les enfants malades du cœur accompagne

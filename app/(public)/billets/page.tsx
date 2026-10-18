@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import EnTete from "@/components/EnTete";
 import Link from "next/link";
 import Billetterie from "@/components/Billetterie";
 import Footer from "@/components/Footer";
@@ -15,22 +16,20 @@ export default function Billets() {
 
   return (
     <>
-      <section className="pagehead">
-        <div className="wrap">
-          <h1>Réservez votre billet</h1>
-          <p>
-            Du cocktail d’accueil au tirage du gros lot. Et le sentiment, en repartant, d’avoir
-            fait quelque chose de bien.
-          </p>
-        </div>
-      </section>
+      <EnTete
+        surtitre="Vendredi 12 novembre 2027"
+        titre="Réservez votre billet"
+        texte="Du cocktail d’accueil au tirage du gros lot. Et le sentiment, en repartant, d’avoir fait quelque chose de bien."
+        image="/images/soiree/fleurs-table.jpg"
+        alt="Une table dressée, fleurs et chandelles"
+      />
 
       <section className="section" id="reserver">
         <div className="wrap">
           <div className="grid grid--2" style={{ gap: "2.5rem", alignItems: "start" }}>
 
             {/* ===== La carte du billet ===== */}
-            <div className="ticket">
+            <div data-reveal className="ticket">
               <div className="ticket__head">
                 <div className="ticket__per">Billet individuel</div>
                 <div className="ticket__price">
@@ -53,7 +52,7 @@ export default function Billets() {
 
             {/* ===== Infos pratiques ===== */}
             <div>
-              <div className="info-box" style={{ marginBottom: "1.6rem" }}>
+              <div data-reveal className="info-box" style={{ marginBottom: "1.6rem" }}>
                 <h3>Tout ce qu’il faut savoir</h3>
                 <dl className="dl">
                   <div><dt>Date</dt><dd>{evenement.date}</dd></div>
@@ -65,7 +64,7 @@ export default function Billets() {
                 </dl>
               </div>
 
-              <div className="card" style={{ marginBottom: "1.6rem" }}>
+              <div data-reveal className="card" style={{ marginBottom: "1.6rem" }}>
                 <h3>Vous venez en groupe ?</h3>
                 <p style={{ color: "var(--ink-soft)" }}>
                   Une table accueille {billet.placesParTable} personnes. Réservez{" "}
@@ -81,7 +80,7 @@ export default function Billets() {
                 </a>
               </div>
 
-              <div className="card">
+              <div data-reveal className="card">
                 <h3>Allergies et régimes</h3>
                 <p style={{ color: "var(--ink-soft)" }}>
                   Le traiteur adapte le repas aux allergies, aux intolérances et aux régimes
@@ -99,7 +98,7 @@ export default function Billets() {
       <section className="section section--sand">
         <div className="wrap">
           <div style={{ maxWidth: 640, marginBottom: "3rem" }}>
-            <h2>Votre billet est déjà un don</h2>
+            <h2 data-lignes>Votre billet est déjà un don</h2>
             <hr className="filet" />
             <p className="lead">
               Ce que vous payez ce soir-là ne finance pas seulement votre assiette. Voici à quoi
@@ -107,7 +106,7 @@ export default function Billets() {
             </p>
           </div>
 
-          <div className="usages">
+          <div className="usages" data-reveal>
             <div>
               <h3>Un toit près de l’hôpital</h3>
               <p>
@@ -135,7 +134,7 @@ export default function Billets() {
 
       <section className="section">
         <div className="wrap center" style={{ maxWidth: 620 }}>
-          <h2>Vous ne pouvez pas venir ?</h2>
+          <h2 data-lignes>Vous ne pouvez pas venir ?</h2>
           <p className="lead" style={{ marginTop: "1rem" }}>
             Ce n’est pas grave. Un don, même petit, change quelque chose pour une famille.
           </p>

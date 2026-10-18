@@ -1,27 +1,27 @@
 import type { Metadata } from "next";
+import EnTete from "@/components/EnTete";
 import Footer from "@/components/Footer";
 import Lots from "@/components/Lots";
+import { lotsPublics } from "@/lib/catalogue";
 import { CONFIG } from "@/lib/donnees";
 
 export const metadata: Metadata = {
   title: "Les prix de l’encan",
   description:
-    "Découvrez la vingtaine de lots de l’encan silencieux de la soirée-bénéfice Pour Clément : séjours, gastronomie, art, plein air et bien plus.",
+    "Les lots de l’encan silencieux de la soirée-bénéfice Pour Clément, offerts par des entreprises d’ici au profit de la Fondation En Cœur.",
 };
 
-export default function Prix() {
+export default async function Prix() {
+  const lots = await lotsPublics();
   return (
     <>
-      <section className="pagehead">
-        <div className="wrap">
-          <p className="surtitre">Encan silencieux</p>
-          <h1>Les prix</h1>
-          <p>
-            Une vingtaine de lots offerts par des entreprises généreuses. Chaque mise remportée
-            devient un soutien concret pour une famille.
-          </p>
-        </div>
-      </section>
+      <EnTete
+        surtitre="Encan silencieux"
+        titre="Les prix"
+        texte="Des lots offerts par des entreprises généreuses. Chaque mise remportée devient un soutien concret pour une famille."
+        image="/images/soiree/verre.jpg"
+        alt="Un verre servi à la lueur des bougies"
+      />
 
       <section className="section">
         <div className="wrap">
@@ -31,10 +31,10 @@ export default function Prix() {
             </div>
           )}
 
-          <Lots />
+          <Lots lots={lots} />
 
           <div className="center" style={{ marginTop: "3.5rem" }}>
-            <div className="card" style={{ maxWidth: 640, margin: "0 auto" }}>
+            <div data-reveal className="card" style={{ maxWidth: 640, margin: "0 auto" }}>
               <h3>Vous aimeriez offrir un lot ?</h3>
               <p style={{ color: "var(--ink-soft)" }}>
                 Chaque prix d’encan donne droit à une visibilité complète : votre logo, une

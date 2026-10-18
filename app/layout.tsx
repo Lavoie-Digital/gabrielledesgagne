@@ -35,8 +35,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         */}
         <noscript>
           <style>{`
-            [data-reveal]{ opacity:1 !important; transform:none !important; }
-            .entre{ animation:none !important; }
+            [data-reveal],[data-lignes],[data-entree]{ opacity:1 !important; visibility:visible !important; transform:none !important; }
+            [data-devoile]{ clip-path:none !important; }
+            .voile{ display:none !important; }
           `}</style>
         </noscript>
       </head>

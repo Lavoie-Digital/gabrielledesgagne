@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import Ourson from "@/components/Ourson";
 import { CONFIG } from "@/lib/donnees";
 
 export default function Footer({ citation = true }: { citation?: boolean }) {
@@ -15,6 +17,7 @@ export default function Footer({ citation = true }: { citation?: boolean }) {
 
         <div className="footer__grid">
           <div>
+            <Ourson className="footer__ourson" />
             <h4>Pour Clément</h4>
             <p style={{ fontSize: ".94rem" }}>
               Soirée-bénéfice et encan silencieux au profit de la Fondation En Cœur.
@@ -57,6 +60,10 @@ export default function Footer({ citation = true }: { citation?: boolean }) {
             &copy; 2027 Soirée-bénéfice Pour Clément
             {" · "}
             <a href="/direct">Les mises en direct</a>
+            {" · "}
+            <Link href="/confidentialite">Politique de confidentialité</Link>
+            {" · "}
+            <a href="/admin" rel="nofollow">Espace privé</a>
           </span>
           <span>
             Fondation En Cœur &middot;{" "}

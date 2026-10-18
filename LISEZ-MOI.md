@@ -14,16 +14,17 @@ Puis va sur **http://localhost:3000**. Tant que le serveur tourne, chaque
 modification que tu enregistres apparaît automatiquement dans le navigateur, sans
 avoir à rafraîchir. Pour arrêter le serveur : `Ctrl + C` dans le terminal.
 
-## Les 5 pages
+## Les pages
 
 | Adresse | Page |
 |---|---|
 | `/` | Accueil : l’histoire, la soirée, le partenaire présentateur, le bandeau Bronze, la Fondation |
-| `/prix` | Les 20 lots avec mise actuelle, filtres par catégorie et fiche détaillée |
+| `/prix` | Les lots de l’encan avec mise actuelle, filtres par catégorie et fiche détaillée |
 | `/commanditaires` | Le lien « Devenez commanditaire » vers le PDF, les trois niveaux, tous les partenaires |
 | `/billets` | Ce qui est inclus, calculateur de billets, bouton vers la billetterie |
 | `/don` | Formulaire Zeffy intégré, montants suggérés, autres façons d’aider |
 | `/direct` | **La page à projeter le soir de la soirée** : les mises classées de la plus haute à la plus basse, mise à jour en continu |
+| `/admin` | **L’espace privé** : lots, commanditaires et mises du soir (accès réservé) |
 
 ---
 
@@ -40,8 +41,11 @@ pour que la salle voie que ça bouge.
 
 ### Pour que les montants changent vraiment pendant la soirée
 
-Il faut une source que quelqu’un peut modifier sans toucher au code. Le plus simple
-est une feuille Google :
+Le plus simple : l’**espace privé**, page **« Mises du soir »** (voir plus bas).
+Quelqu’un tape la nouvelle mise depuis un portable ou un cellulaire, appuie sur
+Entrée, et l’écran projeté suit tout seul.
+
+Autre possibilité, une feuille Google :
 
 1. Crée une feuille avec une ligne d’en-tête : **Titre**, **Mise**, **Mises**
 2. Une ligne par lot. Le titre doit reprendre celui écrit dans `lib/donnees.ts`
@@ -69,12 +73,68 @@ affichés au lieu de se vider, et l’indique en bas. Rien ne disparaît de l’
 
 ---
 
-## Le seul fichier à modifier : `lib/donnees.ts`
+## L’espace privé : `/admin`
 
-Tout le contenu vivant du site est là : tes liens de paiement, tes 20 lots et tes
-commanditaires. Tu peux l’ouvrir avec n’importe quel éditeur de texte.
+Les **lots de l’encan** et les **commanditaires** se gèrent maintenant en ligne, sans
+toucher au code, à l’adresse **`/admin`** (par exemple `tonsite.com/admin`). Ils sont
+enregistrés dans Firestore, la base de données de Firebase.
 
-### 1. Les liens (le plus important)
+Seules les adresses inscrites dans le fichier `.env`, à la ligne `ADMIN_COURRIELS`,
+peuvent entrer : aujourd’hui **xavier@lavoiedigital.ca** et
+**gabrielle@lavoiedigital.ca**. Pour en ajouter une, ajoute-la à cette ligne,
+séparée par une virgule, puis redémarre le site.
+
+On se connecte avec **Google**, ou en recevant un **lien par courriel** (aucun mot de
+passe à retenir). La session dure cinq jours.
+
+Dans l’espace privé :
+
+- **Lots de l’encan** : ajouter, modifier, supprimer un lot, avec sa photo
+- **Commanditaires** : Or, Argent, Bronze et dons matériels, avec leur logo
+- **Mises du soir** : la saisie rapide des mises, pour l’écran `/direct`
+
+Chaque enregistrement met le site public à jour immédiatement.
+
+**Tant qu’aucun lot n’est ajouté**, le site annonce que les lots seront dévoilés
+bientôt et invite les entreprises à en offrir un. Les commanditaires d’exemple
+(« Votre entreprise ici ») restent affichés tant que Firestore n’en contient aucun ;
+le tableau de bord propose de les importer d’un clic pour les modifier.
+
+### Activer Firebase (une seule fois)
+
+Dans la [console Firebase](https://console.firebase.google.com/project/gabrielle-488d0),
+projet **gabrielle-488d0** :
+
+1. **Firestore Database > Créer une base de données.** Emplacement conseillé :
+   `northamerica-northeast1 (Montréal)`, qu’on ne peut plus changer ensuite.
+   Choisis le **mode production** : tout est fermé aux navigateurs, et c’est voulu,
+   car le site passe par son serveur (les règles sont dans `firestore.rules`).
+2. **Authentication > Commencer**, puis dans **Méthode de connexion**, active
+   **Google** et **Adresse e-mail/Mot de passe** avec l’option **Lien envoyé par
+   e-mail (connexion sans mot de passe)**.
+3. **Authentication > Paramètres > Domaines autorisés** : ajoute le domaine du site
+   une fois en ligne (`localhost` y est déjà).
+4. **Storage > Commencer**, pour pouvoir téléverser les photos et les logos. Firebase
+   demande pour cela le forfait **Blaze** (paiement à l’usage ; pour un site comme
+   celui-ci, la facture reste normalement dans la partie gratuite). Sans Storage,
+   tout fonctionne, sauf l’envoi d’images.
+
+### Le fichier `.env`
+
+Il contient les clés de Firebase. La clé privée est **secrète** : ce fichier ne doit
+jamais être envoyé par courriel ni publié (il est exclu de GitHub). Le modèle à suivre
+est dans `.env.example`. Une fois en ligne (Vercel par exemple), recopie les mêmes
+variables dans les réglages du projet, section « Environment Variables ».
+
+---
+
+## Le fichier `lib/donnees.ts`
+
+Il garde la configuration générale : date, lieu, prix du billet, liens de paiement,
+et les catégories de lots. Les lots et commanditaires qui s’y trouvent ne servent
+plus que d’exemples et de solution de repli.
+
+### Les liens de paiement (le plus important)
 
 ```
 liens: {
@@ -92,30 +152,22 @@ Pour les obtenir : crée un compte gratuit sur [zeffy.com](https://www.zeffy.com
 crée un formulaire de billetterie et un formulaire de don, puis copie l’adresse de
 chacun. Pour `donIntegre`, cherche l’option « intégrer » ou « embed » dans Zeffy.
 
-### 2. Les lots
+## Les photos, le logo et les animations
 
-Les 20 lots actuels sont des exemples. Remplace le texte, les valeurs et les mises.
-
-Pour ajouter une photo à un lot : dépose l’image dans le dossier **`public/`**, puis
-écris son nom précédé d’une barre oblique, par exemple `image: "/lot-01.jpg"`. Sans
-photo, le site affiche une vignette verte élégante avec le numéro du lot.
-
-La `categorie` doit être écrite exactement comme dans la liste `CATEGORIES` un peu
-plus haut dans le fichier. Les filtres se construisent tout seuls.
-
-**Pour ouvrir l’encan :** change `ouvert: false` en `ouvert: true`. Les boutons
-« Voir le lot » deviennent alors des boutons **« Miser »** vers ta plateforme.
-
-### 3. Les commanditaires
-
-- `principal` : le partenaire Or, la grande vitrine de l’accueil
-- `secondaires` : les deux partenaires Argent
-- `bronze` : ceux qui défilent dans le bandeau animé
-- `dons` : les entreprises qui offrent un lot
-
-Dépose les logos dans **`public/`** et écris `logo: "/logo-entreprise.png"`. Un PNG à
-fond transparent donne le plus beau résultat. Sans logo, le nom de l’entreprise
-s’affiche joliment dans un cadre.
+- **Le logo de l’ourson** est dessiné d’après l’urne de Clément. Le fichier seul
+  est dans `public/logo-ourson.svg` : il s’agrandit sans perte et peut servir pour
+  l’imprimé (programme, cartons de table, affiches).
+- **Les photos des lots** s’envoient depuis l’espace privé, avec chaque lot.
+- **Les photos de la soirée** (`public/images/soiree/`) sont des images libres de
+  droits (Unsplash), choisies pour illustrer en attendant.
+- **La vidéo de l’accueil** (`public/videos/`) est un montage de quatre plans libres
+  de droits (Pexels) : lumières de salle, champagne, lustre, flûte de rosé. Une
+  version allégée est servie aux téléphones.
+- **Les photos de l’ourson** (`public/images/clement-*.jpg`) sont des recadrages
+  de `clement.jpg`.
+- **Les animations** (GSAP) se règlent dans `app/(public)/template.tsx`. Si la
+  personne a demandé à son appareil de réduire les animations, le site s’affiche
+  sans aucun mouvement.
 
 ---
 
@@ -140,7 +192,8 @@ npm run build
   prudente. Ajuste-la selon ce que la Fondation te confirmera.
 - **L’heure (18 h, accueil 17 h 30) et l’adresse de l’hôtel** sont des suppositions.
   Corrige-les dans `lib/donnees.ts`.
-- **Les 20 lots** sont des exemples. Rien ne doit rester tel quel.
+- **Firebase** : les quatre étapes d’activation plus haut, et les variables du
+  fichier `.env` recopiées chez l’hébergeur.
 
 ---
 
@@ -157,7 +210,9 @@ frontend/
 │   ├── billets/page.tsx
 │   └── don/page.tsx
 ├── components/              Les morceaux réutilisables
-├── lib/donnees.ts           ← LE FICHIER À MODIFIER
+├── app/admin/               L’espace privé (lots, commanditaires, mises)
+├── lib/donnees.ts           Configuration : date, lieu, liens, catégories
+├── lib/catalogue.ts         Lecture des lots et commanditaires dans Firestore
 └── public/                  Logos, photos et le PDF de commandite
 ```
 

@@ -15,7 +15,7 @@ type Ligne = {
 };
 
 type Reponse = {
-  source: "fichier" | "externe";
+  source: "fichier" | "firestore" | "externe";
   maj: string;
   erreur?: string;
   lots: Ligne[];
@@ -35,7 +35,7 @@ function heurePrecise(d: Date): string {
 
 export default function TableauMises() {
   const [lots, setLots] = useState<Ligne[] | null>(null);
-  const [source, setSource] = useState<"fichier" | "externe">("fichier");
+  const [source, setSource] = useState<"fichier" | "firestore" | "externe">("fichier");
   const [erreur, setErreur] = useState<string | null>(null);
   const [panne, setPanne] = useState(false);
   const [maj, setMaj] = useState<Date | null>(null);
@@ -103,6 +103,16 @@ export default function TableauMises() {
     );
   }
 
+  if (!lots.length) {
+    return (
+      <div className="direct">
+        <div className="direct__attente">
+          Les lots apparaîtront ici dès qu’ils seront ajoutés dans l’espace privé.
+        </div>
+      </div>
+    );
+  }
+
   const classes = [...lots].sort((a, b) => b.mise - a.mise || a.titre.localeCompare(b.titre));
   const total = classes.reduce((s, l) => s + l.mise, 0);
   const totalMises = classes.reduce((s, l) => s + l.nbMises, 0);
@@ -165,11 +175,11 @@ export default function TableauMises() {
       </ol>
 
       <footer className="direct__pied">
-        <span className={"direct__etat" + (source === "externe" && !panne ? " est-direct" : "")}>
+        <span className={"direct__etat" + (source !== "fichier" && !panne ? " est-direct" : "")}>
           <i />
           {panne
             ? "Connexion perdue, derniers montants connus"
-            : source === "externe"
+            : source !== "fichier"
               ? "En direct"
               : "Montants du fichier local"}
         </span>

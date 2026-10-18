@@ -1,10 +1,13 @@
-import { CONFIG, LOTS } from "@/lib/donnees";
+import { lotsEnDirect } from "@/lib/catalogue";
+import { CONFIG, type Lot } from "@/lib/donnees";
 
 /**
  * Fournit les montants des mises à la page d’affichage /direct.
  *
  * Deux cas :
- *   - « sourceMises » est vide  → on renvoie les montants de lib/donnees.ts
+ *   - « sourceMises » est vide  → on renvoie les montants enregistrés dans
+ *     Firestore (saisis dans l’espace privé, page « Mises du soir »), ou ceux
+ *     de lib/donnees.ts si Firestore n’est pas encore en place
  *   - « sourceMises » est remplie → on va lire la feuille Google (ou l’API)
  *
  * La lecture se fait ici, côté serveur, et non dans le navigateur : ça évite
@@ -101,9 +104,9 @@ function colonne(entetes: string[], noms: string[]): number {
   return -1;
 }
 
-/* Les montants tels qu’écrits dans lib/donnees.ts */
-function depuisLeFichier(): LigneMise[] {
-  return LOTS.map((l) => ({
+/* Les montants enregistrés pour chaque lot */
+function depuisLeCatalogue(catalogue: Lot[]): LigneMise[] {
+  return catalogue.map((l) => ({
     titre: l.titre,
     mise: l.miseActuelle,
     nbMises: l.nbMises,
@@ -116,8 +119,8 @@ function depuisLeFichier(): LigneMise[] {
 }
 
 /* Complète une ligne externe avec les informations du lot correspondant */
-function enrichir(titre: string, mise: number, nbMises: number): LigneMise {
-  const lot = LOTS.find((l) => normaliser(l.titre) === normaliser(titre));
+function enrichir(catalogue: Lot[], titre: string, mise: number, nbMises: number): LigneMise {
+  const lot = catalogue.find((l) => normaliser(l.titre) === normaliser(titre));
   if (!lot) return { titre, mise, nbMises, connu: false };
   return {
     titre: lot.titre,
@@ -133,12 +136,13 @@ function enrichir(titre: string, mise: number, nbMises: number): LigneMise {
 
 export async function GET() {
   const source = CONFIG.encan.sourceMises;
+  const { lots: catalogue, firestore } = await lotsEnDirect();
 
   if (!source) {
     return Response.json({
-      source: "fichier",
+      source: firestore ? "firestore" : "fichier",
       maj: new Date().toISOString(),
-      lots: depuisLeFichier(),
+      lots: depuisLeCatalogue(catalogue),
     });
   }
 
@@ -165,6 +169,7 @@ export async function GET() {
           : [];
       lots = tableau.map((o) =>
         enrichir(
+          catalogue,
           String(o.titre ?? o.lot ?? ""),
           nombre(String(o.mise ?? o.miseActuelle ?? 0)),
           Math.round(nombre(String(o.nbMises ?? o.mises ?? 0)))
@@ -186,6 +191,7 @@ export async function GET() {
 
       lots = lignes.slice(1).map((l) =>
         enrichir(
+          catalogue,
           (l[iTitre] || "").trim(),
           nombre(l[iMise] || "0"),
           iNb > -1 ? Math.round(nombre(l[iNb] || "0")) : 0
@@ -205,7 +211,7 @@ export async function GET() {
       source: "fichier",
       maj: new Date().toISOString(),
       erreur: e instanceof Error ? e.message : "source illisible",
-      lots: depuisLeFichier(),
+      lots: depuisLeCatalogue(catalogue),
     });
   }
 }

@@ -1,18 +1,43 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { CATEGORIES, CONFIG, LOTS, argent, type Lot } from "@/lib/donnees";
+import { useGSAP } from "@gsap/react";
+import { useEffect, useRef, useState } from "react";
+import ImageLot from "@/components/ImageLot";
+import { CATEGORIES, CONFIG, argent, type Lot } from "@/lib/donnees";
+import { DOUX, ScrollTrigger, defilement, gsap } from "@/lib/mouvement";
 
-export default function Lots() {
+export default function Lots({ lots }: { lots: Lot[] }) {
   const [filtre, setFiltre] = useState("Tous");
   const [ouvert, setOuvert] = useState<number | null>(null);
+  const grille = useRef<HTMLDivElement>(null);
 
   // Seules les catégories réellement utilisées apparaissent dans les filtres
-  const utilisees = CATEGORIES.filter((c) => LOTS.some((l) => l.categorie === c));
+  const utilisees = CATEGORIES.filter((c) => lots.some((l) => l.categorie === c));
 
-  const visibles = LOTS.map((lot, i) => ({ lot, i })).filter(
+  const visibles = lots.map((lot, i) => ({ lot, i })).filter(
     ({ lot }) => filtre === "Tous" || lot.categorie === filtre
+  );
+
+  // Les cartes arrivent en cascade, au chargement et à chaque changement de filtre
+  useGSAP(
+    () => {
+      gsap.matchMedia().add("(prefers-reduced-motion: no-preference)", () => {
+        const cartes = gsap.utils.toArray<HTMLElement>(".lot");
+        gsap.set(cartes, { autoAlpha: 0, y: 40 });
+        ScrollTrigger.batch(cartes, {
+          start: "top 94%",
+          once: true,
+          onEnter: (lot) =>
+            gsap.to(lot, {
+              autoAlpha: 1, y: 0, duration: 1, ease: DOUX, stagger: 0.08, delay: 0.1,
+              clearProps: "transform",
+            }),
+        });
+      });
+      // La hauteur de la page a changé : on recalcule les autres déclencheurs
+      ScrollTrigger.refresh();
+    },
+    { scope: grille, dependencies: [filtre], revertOnUpdate: true }
   );
 
   // Fermer la fiche avec la touche Échap
@@ -23,11 +48,26 @@ export default function Lots() {
     };
     document.addEventListener("keydown", surTouche);
     document.body.style.overflow = "hidden";
+    defilement.arreter();
     return () => {
       document.removeEventListener("keydown", surTouche);
       document.body.style.overflow = "";
+      defilement.reprendre();
     };
   }, [ouvert]);
+
+  if (!lots.length) {
+    return (
+      <div className="center lots-vide">
+        <h2>Les lots arrivent</h2>
+        <hr className="filet" />
+        <p className="lead" style={{ maxWidth: 560, margin: "0 auto" }}>
+          Les entreprises qui offrent un lot sont en train de confirmer leur don. Ils seront
+          présentés ici un à un, avec leur photo, leur valeur et leur mise de départ.
+        </p>
+      </div>
+    );
+  }
 
   const lienDe = (lot: Lot) => lot.lienMise || CONFIG.liens.encan;
   const peutMiser = (lot: Lot) => CONFIG.encan.ouvert && Boolean(lienDe(lot));
@@ -55,14 +95,19 @@ export default function Lots() {
         ))}
       </div>
 
-      <div className="lots">
+      <div className="lots" ref={grille}>
         {visibles.map(({ lot, i }) => (
-          <article className="lot" key={i}>
+          <article className="lot" key={lot.id ?? i}>
             <div className="lot__media">
               <span className="lot__cat">{lot.categorie}</span>
               <span className="lot__num">Lot {String(i + 1).padStart(2, "0")}</span>
               {lot.image ? (
-                <Image src={lot.image} alt={lot.titre} width={600} height={450} />
+                <ImageLot
+                  src={lot.image}
+                  alt={lot.titre}
+                  cadrage={lot.cadrage}
+                  sizes="(max-width: 520px) 100vw, (max-width: 940px) 50vw, 380px"
+                />
               ) : (
                 <div className="lot__placeholder">
                   <b>{String(i + 1).padStart(2, "0")}</b>
@@ -118,7 +163,7 @@ export default function Lots() {
 
       {ouvert !== null && (
         <FicheLot
-          lot={LOTS[ouvert]}
+          lot={lots[ouvert]}
           index={ouvert}
           fermer={() => setOuvert(null)}
         />
@@ -146,7 +191,18 @@ function FicheLot({
         if (e.target === e.currentTarget) fermer();
       }}
     >
-      <div className="modal__box" role="dialog" aria-modal="true" aria-label={lot.titre}>
+      <div
+        className="modal__box"
+        role="dialog"
+        aria-modal="true"
+        aria-label={lot.titre}
+        data-lenis-prevent
+      >
+        {lot.image && (
+          <div className="modal__image">
+            <ImageLot src={lot.image} alt="" cadrage={lot.cadrage} sizes="520px" immediat />
+          </div>
+        )}
         <div className="modal__head">
           <button className="modal__close" onClick={fermer} aria-label="Fermer" autoFocus>
             &times;
