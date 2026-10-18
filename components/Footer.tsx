@@ -70,6 +70,11 @@ export default function Footer({ citation = true }: { citation?: boolean }) {
             <a href="https://en-coeur.org/" target="_blank" rel="noopener">en-coeur.org</a>
           </span>
         </div>
+
+        <p className="footer__credit">
+          Création de{" "}
+          <a href="https://lavoiedigital.ca" target="_blank" rel="noopener">Lavoie Digital</a>
+        </p>
       </div>
     </footer>
   );

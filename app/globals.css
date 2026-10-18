@@ -956,6 +956,9 @@ a.sponsor-card:hover{ transform:translateY(-3px); box-shadow:var(--soft-2); }
   display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between;
   font-size:.8rem; color:#9FB2A4;
 }
+.footer__credit{
+  margin-top:1.2rem; text-align:center; font-size:.75rem; color:#9FB2A4;
+}
 .footer__quote{
   font-family:var(--serif); font-style:italic; font-size:1.25rem; color:#E4EAE5;
   text-align:center; margin-bottom:2.2rem; padding-bottom:2rem;
