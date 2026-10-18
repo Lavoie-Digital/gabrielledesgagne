@@ -2,6 +2,7 @@ import Link from "next/link";
 import BoutonImport from "@/components/admin/BoutonImport";
 import { lireCommanditaires, lireLots } from "@/lib/catalogue";
 import { argent } from "@/lib/donnees";
+import { modeConnexion } from "@/lib/firebase-admin";
 
 export const metadata = { title: "Tableau de bord" };
 
@@ -24,6 +25,7 @@ export default async function TableauDeBord() {
           <p>Le plus souvent, c’est que la base de données n’a pas encore été créée : console
             Firebase &gt; Firestore Database &gt; Créer une base de données.</p>
           <p className="adm-discret">Détail technique : {erreur}</p>
+          <p className="adm-discret">Connexion à Firebase : {modeConnexion}</p>
         </div>
       </>
     );
@@ -35,6 +37,9 @@ export default async function TableauDeBord() {
   return (
     <>
       <h1>Tableau de bord</h1>
+      <p className="adm-discret" style={{ marginTop: "-.6rem", marginBottom: "1.2rem" }}>
+        Firestore connecté ({modeConnexion}).
+      </p>
 
       <div className="adm-chiffres">
         <div><b>{lots.length}</b><span>lots à l’encan</span></div>

@@ -1,0 +1,34 @@
+# Configuration de Firebase App Hosting (site en ligne).
+#
+# Seules des valeurs NON SECRÈTES vont ici : ce fichier est publié sur GitHub.
+# Le serveur App Hosting s’identifie auprès de Firestore et de Storage avec son
+# propre compte de service : aucune clé privée n’est nécessaire en production
+# (voir lib/firebase-admin.ts).
+
+env:
+  # Firebase côté navigateur (connexion à l’espace privé) : valeurs publiques,
+  # nécessaires dès la compilation
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: AIzaSyCYahouRYIHiHwu6dwb3WMKIm-ZCqz4UIs
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: gabrielle-488d0.firebaseapp.com
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: gabrielle-488d0
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: gabrielle-488d0.firebasestorage.app
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "737700152287"
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: 1:737700152287:web:84d7691ecefca7fbe73a6a
+
+  # Firebase côté serveur
+  - variable: FIREBASE_PROJECT_ID
+    value: gabrielle-488d0
+  - variable: FIREBASE_STORAGE_BUCKET
+    value: gabrielle-488d0.firebasestorage.app
+
+  # Les personnes qui ont accès à l’espace privé
+  - variable: ADMIN_COURRIELS
+    value: xavier@lavoiedigital.ca,gabrielle@lavoiedigital.ca
+    availability:
+      - RUNTIME

@@ -9,7 +9,8 @@ import { db, firebaseConfigure } from "@/lib/firebase-admin";
  * Firestore et modifiés depuis l’espace privé (/admin).
  *
  * Les pages publiques lisent une copie en cache, renouvelée dès qu’on
- * enregistre quelque chose dans l’espace privé (étiquette TAG_CATALOGUE).
+ * enregistre quelque chose dans l’espace privé (étiquette TAG_CATALOGUE),
+ * et au plus tard chaque minute.
  * Si Firestore est vide ou injoignable, on affiche les exemples de
  * lib/donnees.ts : le site ne se retrouve jamais vide.
  */
@@ -125,7 +126,7 @@ export async function lotsEnDirect(): Promise<{ lots: Lot[]; firestore: boolean 
 
 export const lotsPublics = unstable_cache(async () => (await lotsEnDirect()).lots, ["lots-publics"], {
   tags: [TAG_CATALOGUE],
-  revalidate: 300,
+  revalidate: 60,
 });
 
 async function commanditairesFrais(): Promise<Commanditaires> {
@@ -149,5 +150,5 @@ async function commanditairesFrais(): Promise<Commanditaires> {
 
 export const commanditairesPublics = unstable_cache(commanditairesFrais, ["commanditaires-publics"], {
   tags: [TAG_CATALOGUE],
-  revalidate: 300,
+  revalidate: 60,
 });
