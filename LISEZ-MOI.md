@@ -21,10 +21,11 @@ avoir à rafraîchir. Pour arrêter le serveur : `Ctrl + C` dans le terminal.
 | `/` | Accueil : l’histoire, la soirée, le partenaire présentateur, le bandeau Bronze, la Fondation |
 | `/prix` | Les lots de l’encan avec mise actuelle, filtres par catégorie et fiche détaillée |
 | `/commanditaires` | Le lien « Devenez commanditaire » vers le PDF, les trois niveaux, tous les partenaires |
-| `/billets` | Ce qui est inclus, calculateur de billets, bouton vers la billetterie |
+| `/billets` | Ce qui est inclus, choix des billets, don supplémentaire, reçu fiscal, paiement Stripe |
+| `/billets/merci` | Les numéros de billets (L101, L102…) affichés après le paiement |
 | `/don` | Formulaire Zeffy intégré, montants suggérés, autres façons d’aider |
 | `/direct` | **La page à projeter le soir de la soirée** : les mises classées de la plus haute à la plus basse, mise à jour en continu |
-| `/admin` | **L’espace privé** : lots, commanditaires et mises du soir (accès réservé) |
+| `/admin` | **L’espace privé** : billets et reçus, lots, commanditaires et mises du soir (accès réservé) |
 
 ---
 
@@ -138,7 +139,6 @@ plus que d’exemples et de solution de repli.
 
 ```
 liens: {
-  billetterie: "",   ← adresse de ton formulaire de billetterie Zeffy
   don: "",           ← adresse de ton formulaire de don Zeffy
   donIntegre: "",    ← même formulaire, version « intégrée » (embed)
   encan: "",         ← adresse de ta plateforme de mises
@@ -149,8 +149,68 @@ Tant qu’un lien reste vide, le site affiche poliment « bientôt disponible »
 qu’un bouton brisé. Personne ne tombera dans le vide.
 
 Pour les obtenir : crée un compte gratuit sur [zeffy.com](https://www.zeffy.com/fr-CA),
-crée un formulaire de billetterie et un formulaire de don, puis copie l’adresse de
-chacun. Pour `donIntegre`, cherche l’option « intégrer » ou « embed » dans Zeffy.
+crée un formulaire de don, puis copie son adresse. (La billetterie, elle, passe par
+Stripe : voir plus bas.) Pour `donIntegre`, cherche l’option « intégrer » ou « embed » dans Zeffy.
+
+## La billetterie : Stripe
+
+Les billets se paient directement sur le site, par **Stripe**.
+
+**Le parcours :**
+
+1. Sur `/billets`, la personne choisit le nombre de billets, peut **ajouter un don**
+   à la Fondation, et peut cocher **« Je souhaite un reçu fiscal »**.
+2. Elle paie sur la page sécurisée de Stripe. Si elle a demandé un reçu, Stripe
+   lui demande son adresse. Elle peut aussi y indiquer une allergie.
+3. Dès que le paiement passe, Stripe prévient le site (le **webhook**), qui
+   attribue les **numéros de billets** : L101, L102, L103… La personne revient sur
+   une page qui affiche ses numéros, à imprimer ou à garder sur son téléphone.
+   Stripe lui envoie aussi un reçu de paiement par courriel.
+
+**La limite de 300 billets :** pendant que quelqu’un paie, ses places sont mises de
+côté 30 minutes. S’il abandonne, elles se libèrent toutes seules. Une fois les 300
+billets vendus, la billetterie affiche « complet ». Le nombre se change dans
+`lib/donnees.ts`, section `billet` (`limite`).
+
+**Le reçu fiscal :** 90 $ par billet, plus le don supplémentaire. Il n’est
+**pas** émis par le site : la Fondation En Cœur l’émet **après la soirée**, une fois
+les fonds remis. Dans l’espace privé, la page **« Billets et reçus »** donne la liste
+à lui transmettre (nom, adresse, montant), avec un bouton **Exporter les reçus
+(CSV)** qui s’ouvre dans Excel. On y trouve aussi le nombre de dons supplémentaires
+avec le nom des personnes, et toutes les commandes avec leurs numéros de billets et
+leurs allergies.
+
+### Brancher Stripe (une seule fois)
+
+1. Crée le compte sur [dashboard.stripe.com](https://dashboard.stripe.com) au nom
+   de l’organisation qui reçoit l’argent.
+2. **Développeurs > Clés API** : copie la **clé secrète** dans `.env`, ligne
+   `STRIPE_SECRET_KEY` (`sk_test_…` pour les essais, `sk_live_…` pour de vrai).
+3. **Développeurs > Webhooks > Ajouter une destination** :
+   - adresse : `https://TON-SITE/api/stripe/webhook`
+   - événements : `checkout.session.completed`,
+     `checkout.session.async_payment_succeeded`,
+     `checkout.session.async_payment_failed`, `checkout.session.expired`
+   - copie le **secret de signature** (`whsec_…`) dans `STRIPE_WEBHOOK_SECRET`.
+4. En ligne (App Hosting), les deux clés vont dans Secret Manager, pas dans
+   `apphosting.yaml` :
+   ```
+   firebase apphosting:secrets:set STRIPE_SECRET_KEY
+   firebase apphosting:secrets:set STRIPE_WEBHOOK_SECRET
+   ```
+5. **Paramètres > Courriels clients** : active « Paiements réussis » pour que
+   chaque acheteur reçoive son reçu de paiement.
+
+**Pour tester en local**, avec la [Stripe CLI](https://docs.stripe.com/stripe-cli) :
+
+```
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+```
+
+Copie le `whsec_…` affiché dans `.env`, redémarre `npm run dev`, puis paie avec la
+carte d’essai `4242 4242 4242 4242` (n’importe quelle date future, n’importe quel CVC).
+
+Tant que `STRIPE_SECRET_KEY` est vide, le bouton affiche « Billetterie bientôt ouverte ».
 
 ## Les photos, le logo et les animations
 

@@ -32,3 +32,16 @@ env:
     value: xavier@lavoiedigital.ca,gabrielle@lavoiedigital.ca
     availability:
       - RUNTIME
+
+  # Stripe (billetterie) : les deux clés sont des SECRETS, rangés dans Cloud
+  # Secret Manager et jamais écrits ici. Pour les créer une fois :
+  #   firebase apphosting:secrets:set STRIPE_SECRET_KEY
+  #   firebase apphosting:secrets:set STRIPE_WEBHOOK_SECRET
+  - variable: STRIPE_SECRET_KEY
+    secret: STRIPE_SECRET_KEY
+    availability:
+      - RUNTIME
+  - variable: STRIPE_WEBHOOK_SECRET
+    secret: STRIPE_WEBHOOK_SECRET
+    availability:
+      - RUNTIME

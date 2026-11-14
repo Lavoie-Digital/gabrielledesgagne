@@ -1,19 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
+import { passerAuPaiement } from "@/app/(public)/billets/actions";
 import { CONFIG, argent } from "@/lib/donnees";
 
-export default function Billetterie() {
-  const prix = CONFIG.billet.prix;
-  const parTable = CONFIG.billet.placesParTable;
-  const [qte, setQte] = useState(1);
+/**
+ * Le formulaire de réservation : nombre de billets, reçu fiscal, don
+ * supplémentaire, puis envoi vers la page de paiement sécurisée de Stripe.
+ *
+ * `restantes` vaut null quand on ne sait pas (Firestore injoignable) ;
+ * `ouverte` est faux tant que Stripe n’est pas configuré.
+ */
+export default function Billetterie({ restantes, ouverte }: { restantes: number | null; ouverte: boolean }) {
+  const { prix, placesParTable, maxParCommande, montantRecuParBillet, donsSuggeres } = CONFIG.billet;
+  const max = Math.max(1, Math.min(maxParCommande, restantes ?? maxParCommande));
+  const complet = restantes === 0;
 
-  const borner = (n: number) => Math.min(40, Math.max(1, n || 1));
-  const tables = qte / parTable;
-  const lienActif = Boolean(CONFIG.liens.billetterie);
+  const [qte, setQte] = useState(1);
+  const [recu, setRecu] = useState(false);
+  const [don, setDon] = useState(0);
+  const [autre, setAutre] = useState("");
+  const [etat, action, envoi] = useActionState(passerAuPaiement, null);
+
+  const borner = (n: number) => Math.min(max, Math.max(1, n || 1));
+  const tables = qte / placesParTable;
+  const total = qte * prix + don;
+  const choisirAutre = (v: string) => {
+    setAutre(v);
+    const n = Math.round(Number(v.replace(",", ".")));
+    setDon(Number.isFinite(n) && n > 0 ? n : 0);
+  };
+
+  if (complet) {
+    return (
+      <p className="billetterie-erreur" style={{ textAlign: "center" }}>
+        La soirée affiche complet. Merci de tout cœur ! Il est encore possible de faire un don.
+      </p>
+    );
+  }
 
   return (
-    <>
+    <form action={action}>
+      <input type="hidden" name="qte" value={qte} />
+      <input type="hidden" name="don" value={don} />
+
+      {restantes !== null && restantes <= 40 && (
+        <p className="places-restantes">
+          Plus que {restantes} {restantes > 1 ? "places" : "place"} disponibles
+        </p>
+      )}
+
       <div className="qty">
         <label htmlFor="qte">Nombre de billets</label>
         <div className="qty__control">
@@ -24,7 +60,7 @@ export default function Billetterie() {
             type="number"
             id="qte"
             min={1}
-            max={40}
+            max={max}
             value={qte}
             onChange={(e) => setQte(borner(parseInt(e.target.value, 10)))}
           />
@@ -32,10 +68,55 @@ export default function Billetterie() {
             +
           </button>
         </div>
-        <button type="button" className="btn btn--ghost btn--sm" onClick={() => setQte(parTable)}>
-          Une table de {parTable}
-        </button>
+        {placesParTable <= max && (
+          <button type="button" className="btn btn--ghost btn--sm" onClick={() => setQte(placesParTable)}>
+            Une table de {placesParTable}
+          </button>
+        )}
       </div>
+
+      <div className="don-extra">
+        <p>Ajouter un don à la Fondation (facultatif)</p>
+        <div className="don-extra__choix">
+          {donsSuggeres.map((m) => (
+            <button
+              key={m}
+              type="button"
+              aria-pressed={don === m && !autre}
+              onClick={() => {
+                setAutre("");
+                setDon(don === m && !autre ? 0 : m);
+              }}
+            >
+              {argent(m)}
+            </button>
+          ))}
+          <label className="don-extra__autre">
+            <span className="sr-only">Autre montant</span>
+            <input
+              type="text"
+              inputMode="numeric"
+              placeholder="Autre"
+              value={autre}
+              onChange={(e) => choisirAutre(e.target.value.replace(/[^\d,.]/g, ""))}
+            />
+            $
+          </label>
+        </div>
+      </div>
+
+      <label className="option-recu">
+        <input type="checkbox" name="recu" checked={recu} onChange={(e) => setRecu(e.target.checked)} />
+        <span>
+          <b>Je souhaite un reçu fiscal</b>
+          <small>
+            {argent(montantRecuParBillet)} par billet{don > 0 ? " + votre don" : ""}, soit{" "}
+            <b>{argent(qte * montantRecuParBillet + don)}</b>. Le reçu est émis par la Fondation
+            En Cœur après la soirée, une fois les fonds remis. Votre adresse vous sera demandée
+            au paiement.
+          </small>
+        </span>
+      </label>
 
       <div className="total-box">
         <div>
@@ -45,20 +126,22 @@ export default function Billetterie() {
             {Number.isInteger(tables) && tables >= 1
               ? `, soit ${tables} ${tables > 1 ? "tables complètes" : "table complète"}`
               : ""}
+            {don > 0 ? ` + don de ${argent(don)}` : ""}
           </div>
         </div>
-        <b>{argent(qte * prix)}</b>
+        <b>{argent(total)}</b>
       </div>
 
-      {lienActif ? (
-        <a
-          className="btn btn--primary btn--block"
-          href={CONFIG.liens.billetterie}
-          target="_blank"
-          rel="noopener"
-        >
-          Passer à la réservation
-        </a>
+      {etat?.message && (
+        <p className="billetterie-erreur" role="alert">
+          {etat.message}
+        </p>
+      )}
+
+      {ouverte ? (
+        <button type="submit" className="btn btn--primary btn--block" disabled={envoi}>
+          {envoi ? "Un instant…" : "Passer au paiement"}
+        </button>
       ) : (
         <span className="btn btn--primary btn--block btn--disabled" aria-disabled="true">
           Billetterie bientôt ouverte
@@ -66,10 +149,10 @@ export default function Billetterie() {
       )}
 
       <p style={{ fontSize: ".82rem", color: "var(--ink-soft)", marginTop: "1rem", textAlign: "center" }}>
-        Le paiement se fait de façon sécurisée sur notre plateforme de billetterie.
-        Une question ? Écrivez à{" "}
+        Paiement sécurisé par Stripe. Vos numéros de billets s’affichent dès le paiement
+        confirmé. Une question ? Écrivez à{" "}
         <a href={`mailto:${CONFIG.contact.courriel}`}>{CONFIG.contact.courriel}</a>.
       </p>
-    </>
+    </form>
   );
 }

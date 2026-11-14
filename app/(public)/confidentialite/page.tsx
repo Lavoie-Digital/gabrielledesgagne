@@ -104,17 +104,24 @@ export default function Confidentialite() {
 
             <h3>Quand vous réservez un billet, faites un don ou misez</h3>
             <p>
-              Les paiements se font sur des plateformes spécialisées : Zeffy pour la billetterie
-              et les dons, et la plateforme d’encan indiquée sur la page des prix. Elles
-              recueillent votre nom, vos coordonnées et les renseignements de paiement. Nous ne
-              voyons jamais votre numéro de carte. Nous recevons de ces plateformes votre nom,
-              vos coordonnées, le nombre de billets, le montant de votre don ou de votre mise,
-              afin de :
+              Les paiements se font sur des plateformes spécialisées : Stripe pour la
+              billetterie, Zeffy pour les dons faits sur la page « Faire un don », et la
+              plateforme d’encan indiquée sur la page des prix. Elles recueillent votre nom, vos
+              coordonnées et les renseignements de paiement. Nous ne voyons jamais votre numéro
+              de carte. Nous recevons de ces plateformes votre nom, votre courriel, votre
+              téléphone, le nombre de billets et vos numéros de billets, le montant de votre
+              don ou de votre mise, afin de :
             </p>
             <ul className="liste">
               <li>vous accueillir à la soirée et vous placer à une table ;</li>
               <li>vous remettre un lot remporté à l’encan ;</li>
               <li>transmettre votre don à la Fondation En Cœur, qui émet les reçus fiscaux ;</li>
+              <li>
+                si vous cochez « Je souhaite un reçu fiscal » en achetant vos billets : transmettre
+                à la Fondation votre nom, votre adresse postale et le montant admissible, pour
+                qu’elle émette votre reçu après la soirée. Sans cette case cochée, nous ne
+                recueillons pas votre adresse ;
+              </li>
               <li>vous écrire au sujet de la soirée (confirmation, horaire, changement).</li>
             </ul>
 
@@ -177,7 +184,10 @@ export default function Confidentialite() {
             </p>
             <ul className="liste">
               <li><b>la Fondation En Cœur</b>, pour les dons et les reçus fiscaux ;</li>
-              <li><b>Zeffy</b> et la <b>plateforme d’encan</b>, qui traitent les paiements ;</li>
+              <li>
+                <b>Stripe</b>, <b>Zeffy</b> et la <b>plateforme d’encan</b>, qui traitent les
+                paiements ;
+              </li>
               <li>
                 <b>l’hôtel et le traiteur</b>, pour la liste des invités, le plan de salle et les
                 repas adaptés ;
@@ -195,8 +205,8 @@ export default function Confidentialite() {
 
             <h2 id="hors-quebec">Renseignements conservés hors du Québec</h2>
             <p>
-              Certains de nos fournisseurs techniques, notamment Google (Firebase) et l’hébergeur
-              du site, peuvent conserver des renseignements sur des serveurs situés à l’extérieur
+              Certains de nos fournisseurs techniques, notamment Google (Firebase), Stripe et
+              l’hébergeur du site, peuvent conserver des renseignements sur des serveurs situés à l’extérieur
               du Québec, par exemple aux États-Unis. Avant de leur confier des renseignements,
               nous évaluons, comme l’exige la loi, si ceux-ci y bénéficient d’une protection
               adéquate, notamment au regard des engagements contractuels de ces fournisseurs.
@@ -205,8 +215,9 @@ export default function Confidentialite() {
             <h2 id="conservation">Combien de temps nous les gardons</h2>
             <p>
               Nous gardons vos renseignements le temps nécessaire aux fins pour lesquelles ils ont
-              été recueillis. Les listes d’invités, les renseignements alimentaires et les
-              coordonnées des personnes qui ont misé sont détruits au plus tard{" "}
+              été recueillis. Les listes d’invités, les renseignements alimentaires, les adresses
+              transmises pour les reçus fiscaux et les coordonnées des personnes qui ont misé
+              sont détruits au plus tard{" "}
               <b>douze mois après la soirée</b>, sauf si la loi nous oblige à les garder plus
               longtemps (par exemple pour la comptabilité). Ils sont alors détruits de façon
               sécuritaire ou rendus anonymes.

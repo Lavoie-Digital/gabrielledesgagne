@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const LIENS = [
   { href: "/admin", libelle: "Tableau de bord" },
+  { href: "/admin/billets", libelle: "Billets et reçus" },
   { href: "/admin/lots", libelle: "Lots de l’encan" },
   { href: "/admin/commanditaires", libelle: "Commanditaires" },
   { href: "/admin/mises", libelle: "Mises du soir" },

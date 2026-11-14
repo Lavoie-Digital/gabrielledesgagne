@@ -51,13 +51,27 @@ export const CONFIG = {
     responsable: "Gabrielle Desgagné",
     titre: "Organisatrice de la soirée et responsable de la protection des renseignements personnels",
     courriel: "gabrielledesg@hotmail.com",
-    miseAJour: "18 octobre 2026",
+    miseAJour: "14 novembre 2026",
   },
 
   /* --- Le billet --- */
   billet: {
     prix: 150,
     placesParTable: 8,
+    // Nombre total de billets vendus en ligne. La billetterie se ferme
+    // d’elle-même une fois ce nombre atteint.
+    limite: 300,
+    // Maximum de billets par commande
+    maxParCommande: 40,
+    // Numéros des billets vendus en ligne : L101, L102, L103…
+    prefixeNumero: "L",
+    premierNumero: 101,
+    // Partie du billet admissible à un reçu fiscal (prix du billet moins la
+    // valeur du repas et des consommations). Le reçu est émis par la
+    // Fondation En Cœur après la soirée, une fois les fonds remis.
+    montantRecuParBillet: 90,
+    // Montants proposés pour le don supplémentaire (en dollars)
+    donsSuggeres: [25, 50, 100, 250],
   },
 
   /* ---------------------------------------------------------------------
@@ -66,9 +80,6 @@ export const CONFIG = {
      « bientôt disponible » au lieu d’un bouton brisé.
      --------------------------------------------------------------------- */
   liens: {
-    // Formulaire de billetterie Zeffy (collez l’adresse complète)
-    billetterie: "",
-
     // Formulaire de don Zeffy, version « page »
     don: "",
 
