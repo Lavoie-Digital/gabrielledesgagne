@@ -1,6 +1,14 @@
 import type Stripe from "stripe";
 import { confirmerPaiement, liberer, marquerEnTraitement } from "@/lib/billetterie";
+import { envoyerBillets } from "@/lib/envoi-billets";
 import { stripe } from "@/lib/stripe";
+
+/* Confirme le paiement puis envoie les billets par courriel. Si SendGrid
+   échoue, l’erreur remonte : Stripe renverra l’événement plus tard. */
+async function confirmerEtEnvoyer(session: Stripe.Checkout.Session) {
+  const commande = await confirmerPaiement(session);
+  if (commande?.statut === "payee") await envoyerBillets(commande.id);
+}
 
 /**
  * Le webhook Stripe : Stripe appelle cette adresse à chaque étape d’un
@@ -35,14 +43,14 @@ export async function POST(request: Request) {
       case "checkout.session.completed": {
         const session = evenement.data.object;
         if (session.payment_status === "paid" || session.payment_status === "no_payment_required") {
-          await confirmerPaiement(session);
+          await confirmerEtEnvoyer(session);
         } else {
           await marquerEnTraitement(session);
         }
         break;
       }
       case "checkout.session.async_payment_succeeded":
-        await confirmerPaiement(evenement.data.object);
+        await confirmerEtEnvoyer(evenement.data.object);
         break;
       case "checkout.session.async_payment_failed":
       case "checkout.session.expired": {

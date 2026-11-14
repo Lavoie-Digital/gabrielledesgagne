@@ -1,5 +1,7 @@
 import { lireCommandes, placesEnCoursDePaiement, type Adresse, type Commande } from "@/lib/billetterie";
 import { CONFIG, argent } from "@/lib/donnees";
+import BoutonRenvoyer from "@/components/admin/BoutonRenvoyer";
+import { courrielConfigure } from "@/lib/courriel";
 import { stripeConfigure } from "@/lib/stripe";
 
 export const metadata = { title: "Billets et reçus" };
@@ -51,6 +53,13 @@ export default async function Billets() {
         <div className="adm-alerte" style={{ marginBottom: "1.2rem" }}>
           <p><b>Stripe n’est pas encore branché.</b> La billetterie affiche « bientôt ouverte » tant
             que STRIPE_SECRET_KEY et STRIPE_WEBHOOK_SECRET ne sont pas configurés.</p>
+        </div>
+      )}
+      {!courrielConfigure && (
+        <div className="adm-alerte" style={{ marginBottom: "1.2rem" }}>
+          <p><b>SendGrid n’est pas encore branché.</b> Les numéros de billets s’affichent à
+            l’écran après le paiement, mais aucun courriel n’est envoyé tant que
+            SENDGRID_API_KEY et SENDGRID_FROM ne sont pas configurés.</p>
         </div>
       )}
       {erreur && (
@@ -142,6 +151,7 @@ export default async function Billets() {
                 <th>Allergies</th>
                 <th className="nb">Billets</th>
                 <th className="nb">Payé</th>
+                <th>Courriel des billets</th>
               </tr>
             </thead>
             <tbody>
@@ -152,6 +162,16 @@ export default async function Billets() {
                   <td>{c.allergies || "—"}</td>
                   <td className="nb">{c.qte}</td>
                   <td className="nb">{argent(c.total)}</td>
+                  <td>
+                    {c.courrielEnvoyeLe ? (
+                      <small>Envoyé {date(c.courrielEnvoyeLe)}</small>
+                    ) : c.courrielErreur ? (
+                      <small style={{ color: "#7A3226" }} title={c.courrielErreur}>Échec de l’envoi</small>
+                    ) : (
+                      <small>Pas encore envoyé</small>
+                    )}
+                    {courrielConfigure && <BoutonRenvoyer id={c.id} dejaEnvoye={Boolean(c.courrielEnvoyeLe)} />}
+                  </td>
                 </tr>
               ))}
             </tbody>

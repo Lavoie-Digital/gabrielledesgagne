@@ -164,8 +164,9 @@ Les billets se paient directement sur le site, par **Stripe**.
    lui demande son adresse. Elle peut aussi y indiquer une allergie.
 3. Dès que le paiement passe, Stripe prévient le site (le **webhook**), qui
    attribue les **numéros de billets** : L101, L102, L103… La personne revient sur
-   une page qui affiche ses numéros, à imprimer ou à garder sur son téléphone.
-   Stripe lui envoie aussi un reçu de paiement par courriel.
+   une page qui affiche ses numéros, à imprimer ou à garder sur son téléphone, et
+   **reçoit ses billets par courriel** (SendGrid). Stripe lui envoie aussi son reçu
+   de paiement.
 
 **La limite de 300 billets :** pendant que quelqu’un paie, ses places sont mises de
 côté 30 minutes. S’il abandonne, elles se libèrent toutes seules. Une fois les 300
@@ -211,6 +212,23 @@ Copie le `whsec_…` affiché dans `.env`, redémarre `npm run dev`, puis paie a
 carte d’essai `4242 4242 4242 4242` (n’importe quelle date future, n’importe quel CVC).
 
 Tant que `STRIPE_SECRET_KEY` est vide, le bouton affiche « Billetterie bientôt ouverte ».
+
+### Brancher SendGrid (courriel des billets)
+
+1. Sur [sendgrid.com](https://sendgrid.com), **Settings > Sender Authentication** :
+   authentifie le domaine du site (le mieux, les courriels arrivent moins souvent
+   dans les indésirables) ou au minimum vérifie une adresse d’expédition.
+2. **Settings > API Keys > Create API Key**, accès restreint avec seulement
+   **Mail Send**. Copie la clé (`SG.…`) dans `.env`, ligne `SENDGRID_API_KEY`.
+3. Mets l’adresse vérifiée à la ligne `SENDGRID_FROM` (dans `.env` et dans
+   `apphosting.yaml`). Les réponses des acheteurs arrivent à l’adresse de contact
+   de `lib/donnees.ts`.
+4. En ligne : `firebase apphosting:secrets:set SENDGRID_API_KEY`.
+
+Si un envoi échoue, Stripe redemande au site un peu plus tard et le courriel repart
+tout seul. Dans **Billets et reçus**, la colonne « Courriel des billets » montre
+l’état de chaque envoi, avec un bouton **Envoyer / Renvoyer** (pratique si quelqu’un
+ne trouve plus son courriel).
 
 ## Les photos, le logo et les animations
 

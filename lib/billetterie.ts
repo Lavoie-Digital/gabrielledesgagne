@@ -52,6 +52,8 @@ export type Commande = {
   adresse: Adresse | null;
   allergies: string;
   numeros: string[];
+  courrielEnvoyeLe: number | null; // billets envoyés par courriel (SendGrid)
+  courrielErreur: string;
 };
 
 const COMMANDES = "commandes";
@@ -118,6 +120,8 @@ function versCommande(id: string, d: FirebaseFirestore.DocumentData): Commande {
       : null,
     allergies: texte(d.allergies),
     numeros: Array.isArray(d.numeros) ? d.numeros.filter((n: unknown) => typeof n === "string") : [],
+    courrielEnvoyeLe: typeof d.courrielEnvoyeLe === "number" ? d.courrielEnvoyeLe : null,
+    courrielErreur: texte(d.courrielErreur),
   };
 }
 
@@ -277,4 +281,36 @@ export async function marquerEnTraitement(session: Stripe.Checkout.Session) {
     if (!d.exists || d.data()!.statut !== "en_attente") return;
     t.update(ref, { ...coordonnees(session), statut: "en_traitement" });
   });
+}
+
+/* ----------------------------------------------------------------------
+   3. Envoi des billets par courriel
+   Une seule personne « réserve » l’envoi à la fois : le webhook et la page
+   de remerciement peuvent arriver ensemble sans envoyer deux courriels.
+   ---------------------------------------------------------------------- */
+
+const DELAI_TENTATIVE_MS = 2 * 60 * 1000;
+
+/* Renvoie la commande si c’est à nous d’envoyer le courriel, sinon null */
+export async function reserverEnvoi(id: string, forcer = false): Promise<Commande | null> {
+  const ref = db().collection(COMMANDES).doc(id);
+  return db().runTransaction(async (t) => {
+    const d = await t.get(ref);
+    if (!d.exists) return null;
+    const c = versCommande(d.id, d.data()!);
+    if (c.statut !== "payee" || !c.courriel) return null;
+    const tentative = nombre(d.data()!.courrielTentative);
+    if (!forcer && (c.courrielEnvoyeLe || Date.now() - tentative < DELAI_TENTATIVE_MS)) return null;
+    t.update(ref, { courrielTentative: Date.now() });
+    return c;
+  });
+}
+
+export async function noterEnvoi(id: string, erreur?: string) {
+  const ref = db().collection(COMMANDES).doc(id);
+  await ref.update(
+    erreur
+      ? { courrielErreur: erreur.slice(0, 500), courrielTentative: 0 }
+      : { courrielEnvoyeLe: Date.now(), courrielErreur: "" },
+  );
 }

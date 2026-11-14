@@ -4,6 +4,7 @@ import BoutonImprimer from "@/components/BoutonImprimer";
 import Footer from "@/components/Footer";
 import { confirmerPaiement, lireCommande, type Commande } from "@/lib/billetterie";
 import { CONFIG, argent } from "@/lib/donnees";
+import { envoyerBillets } from "@/lib/envoi-billets";
 import { stripe, stripeConfigure } from "@/lib/stripe";
 
 export const metadata: Metadata = {
@@ -22,7 +23,12 @@ async function trouverCommande(sessionId: string): Promise<{ commande: Commande 
     const session = await stripe().checkout.sessions.retrieve(sessionId);
     const id = session.client_reference_id ?? "";
     if (session.payment_status === "paid") {
-      return { commande: await confirmerPaiement(session), enCours: false };
+      const commande = await confirmerPaiement(session);
+      // Si le webhook n’est pas encore passé, on envoie le courriel d’ici
+      if (commande) {
+        await envoyerBillets(commande.id).catch((e) => console.error("[billets] courriel", e));
+      }
+      return { commande: commande ? await lireCommande(commande.id) : null, enCours: false };
     }
     return { commande: await lireCommande(id), enCours: session.status === "complete" };
   } catch {
@@ -70,8 +76,10 @@ export default async function Merci({ searchParams }: { searchParams: Promise<{ 
           <p className="lead" style={{ marginTop: "1rem" }}>
             {n > 1 ? `Vos ${n} billets sont confirmés.` : "Votre billet est confirmé."} Gardez cette
             page ou imprimez-la : à l’accueil, il suffit de donner votre nom ou un numéro de
-            billet. Un reçu de paiement vous est aussi envoyé par courriel
-            {commande.courriel ? ` à ${commande.courriel}` : ""}.
+            billet.{" "}
+            {commande.courrielEnvoyeLe
+              ? `Vos billets vous ont aussi été envoyés par courriel à ${commande.courriel}.`
+              : `Un reçu de paiement vous est envoyé par courriel${commande.courriel ? ` à ${commande.courriel}` : ""}.`}
           </p>
 
           <div className="ticket" style={{ marginTop: "2rem" }}>

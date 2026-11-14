@@ -45,3 +45,20 @@ env:
     secret: STRIPE_WEBHOOK_SECRET
     availability:
       - RUNTIME
+
+  # SendGrid (envoi des billets par courriel). La clé est un SECRET :
+  #   firebase apphosting:secrets:set SENDGRID_API_KEY
+  - variable: SENDGRID_API_KEY
+    secret: SENDGRID_API_KEY
+    availability:
+      - RUNTIME
+  # Adresse d’expédition, vérifiée dans SendGrid (Settings > Sender Authentication).
+  # À DÉCOMMENTER ET REMPLIR avant la mise en ligne :
+  # - variable: SENDGRID_FROM
+  #   value: billets@votre-domaine.ca
+  #   availability:
+  #     - RUNTIME
+  - variable: SENDGRID_FROM_NOM
+    value: Pour Clément
+    availability:
+      - RUNTIME

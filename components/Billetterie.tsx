@@ -150,7 +150,7 @@ export default function Billetterie({ restantes, ouverte }: { restantes: number 
 
       <p style={{ fontSize: ".82rem", color: "var(--ink-soft)", marginTop: "1rem", textAlign: "center" }}>
         Paiement sécurisé par Stripe. Vos numéros de billets s’affichent dès le paiement
-        confirmé. Une question ? Écrivez à{" "}
+        confirmé et vous sont envoyés par courriel. Une question ? Écrivez à{" "}
         <a href={`mailto:${CONFIG.contact.courriel}`}>{CONFIG.contact.courriel}</a>.
       </p>
     </form>

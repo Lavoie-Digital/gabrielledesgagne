@@ -193,8 +193,9 @@ export default function Confidentialite() {
                 repas adaptés ;
               </li>
               <li>
-                nos <b>fournisseurs techniques</b> : l’hébergeur du site et Google Firebase, qui
-                héberge la base de données de l’encan et la connexion à l’espace privé.
+                nos <b>fournisseurs techniques</b> : l’hébergeur du site, Google Firebase, qui
+                héberge la base de données de l’encan, des billets et la connexion à l’espace
+                privé, et SendGrid (Twilio), qui envoie le courriel contenant vos billets.
               </li>
             </ul>
             <p>
@@ -205,8 +206,8 @@ export default function Confidentialite() {
 
             <h2 id="hors-quebec">Renseignements conservés hors du Québec</h2>
             <p>
-              Certains de nos fournisseurs techniques, notamment Google (Firebase), Stripe et
-              l’hébergeur du site, peuvent conserver des renseignements sur des serveurs situés à l’extérieur
+              Certains de nos fournisseurs techniques, notamment Google (Firebase), Stripe,
+              SendGrid et l’hébergeur du site, peuvent conserver des renseignements sur des serveurs situés à l’extérieur
               du Québec, par exemple aux États-Unis. Avant de leur confier des renseignements,
               nous évaluons, comme l’exige la loi, si ceux-ci y bénéficient d’une protection
               adéquate, notamment au regard des engagements contractuels de ces fournisseurs.
