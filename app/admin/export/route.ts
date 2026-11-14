@@ -30,17 +30,17 @@ export async function GET(request: Request) {
   const lignes =
     quoi === "recus"
       ? [
-          ligne(["Nom", "Courriel", "Adresse", "Adresse (suite)", "Ville", "Province", "Code postal", "Pays", "Billets", "Don supplémentaire", "Montant du reçu", "Date du paiement", "Numéros de billets"]),
+          ligne(["Prénom", "Nom", "Courriel", "Adresse", "Adresse (suite)", "Ville", "Province", "Code postal", "Pays", "Billets", "Don supplémentaire", "Montant du reçu", "Date du paiement", "Numéros de billets"]),
           ...payees
             .filter((c) => c.recu)
             .map((c) =>
-              ligne([c.nom, c.courriel, a(c).ligne1, a(c).ligne2, a(c).ville, a(c).province, a(c).codePostal, a(c).pays, c.qte, c.donExtra, c.montantRecu, date(c.payeeLe), c.numeros.join(" ")]),
+              ligne([c.prenom || c.nom, c.nomFamille, c.courriel, a(c).ligne1, a(c).ligne2, a(c).ville, a(c).province, a(c).codePostal, a(c).pays, c.qte, c.donExtra, c.montantRecu, date(c.payeeLe), c.numeros.join(" ")]),
             ),
         ]
       : [
-          ligne(["Numéros de billets", "Nom", "Courriel", "Téléphone", "Billets", "Don supplémentaire", "Total payé", "Reçu demandé", "Montant du reçu", "Allergies", "Date du paiement", "Paiement Stripe"]),
+          ligne(["Numéros de billets", "Prénom", "Nom", "Courriel", "Téléphone", "Billets", "Don supplémentaire", "Total payé", "Reçu demandé", "Montant du reçu", "Allergies", "Date du paiement", "Paiement Stripe"]),
           ...payees.map((c) =>
-            ligne([c.numeros.join(" "), c.nom, c.courriel, c.telephone, c.qte, c.donExtra, c.total, c.recu ? "Oui" : "Non", c.montantRecu, c.allergies, date(c.payeeLe), c.paiementId]),
+            ligne([c.numeros.join(" "), c.prenom || c.nom, c.nomFamille, c.courriel, c.telephone, c.qte, c.donExtra, c.total, c.recu ? "Oui" : "Non", c.montantRecu, c.allergies, date(c.payeeLe), c.paiementId]),
           ),
         ];
 

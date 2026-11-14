@@ -99,7 +99,23 @@ export async function passerAuPaiement(_: EtatPaiement, form: FormData): Promise
             ]
           : []),
       ],
+      // Prénom et nom séparés, obligatoires : liste d’accueil et reçus fiscaux
+      // (Stripe permet au plus 3 champs personnalisés)
       custom_fields: [
+        {
+          key: "prenom",
+          type: "text",
+          optional: false,
+          label: { type: "custom", custom: "Prénom" },
+          text: { minimum_length: 1, maximum_length: 80 },
+        },
+        {
+          key: "nom",
+          type: "text",
+          optional: false,
+          label: { type: "custom", custom: "Nom de famille" },
+          text: { minimum_length: 1, maximum_length: 80 },
+        },
         {
           key: "allergies",
           type: "text",

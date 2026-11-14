@@ -59,6 +59,64 @@ export default async function Commanditaires() {
         alt="Une salle de réception dressée"
       />
 
+      {/* ===== Le présentateur ===== */}
+      <section className="section">
+        <div className="wrap">
+          <Credit c={COMMANDITAIRES.principal} />
+        </div>
+      </section>
+
+      {/* ===== Argent ===== */}
+      {COMMANDITAIRES.secondaires.length > 0 && (
+        <section className="section section--mist">
+          <div className="wrap">
+            <p className="surtitre center">Partenaires Argent</p>
+            <div style={{ marginTop: "1.5rem" }}>
+              <GrilleCommanditaires
+                liste={COMMANDITAIRES.secondaires}
+                etiquette="Partenaire Argent"
+                colonnes="grid--2"
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ===== Bronze ===== */}
+      {COMMANDITAIRES.bronze.length > 0 && (
+        <section className="section">
+          <div className="wrap">
+            <p className="surtitre center">Partenaires Bronze</p>
+            <div style={{ marginTop: "1.5rem" }}>
+              <GrilleCommanditaires
+                liste={COMMANDITAIRES.bronze}
+                etiquette="Partenaire Bronze"
+              />
+            </div>
+          </div>
+          <div style={{ marginTop: "3rem" }}>
+            <BandeauDefilant liste={COMMANDITAIRES.bronze} />
+          </div>
+        </section>
+      )}
+
+      {/* ===== Dons matériels ===== */}
+      <section className="section section--sand">
+        <div className="wrap">
+          <p className="surtitre center">Dons matériels</p>
+          <p className="lead center" style={{ maxWidth: 620, margin: "0 auto 2.5rem" }}>
+            Le gros lot du tirage et les prix de l’encan sont offerts par des entreprises qui ont
+            accepté de donner sans rien demander en retour.
+          </p>
+          <GrilleCommanditaires liste={COMMANDITAIRES.dons} etiquette="Don matériel" />
+          <div className="center" style={{ marginTop: "2.5rem" }}>
+            <Link className="btn btn--ghost btn--sm" href="/prix">
+              Voir les lots de l’encan
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ===== Devenir commanditaire ===== */}
       <section className="section" style={{ paddingBlock: "clamp(2.5rem,5vw,3.5rem)" }}>
         <div className="wrap">
@@ -110,60 +168,6 @@ export default async function Commanditaires() {
             Deux formules de don matériel s’ajoutent à ces paliers : le gros lot du tirage et les
             prix de l’encan silencieux. Elles sont décrites dans le plan de commandite.
           </p>
-        </div>
-      </section>
-
-      {/* ===== Le présentateur ===== */}
-      <section className="section">
-        <div className="wrap">
-          <Credit c={COMMANDITAIRES.principal} />
-        </div>
-      </section>
-
-      {/* ===== Argent ===== */}
-      <section className="section section--mist">
-        <div className="wrap">
-          <p className="surtitre center">Partenaires Argent</p>
-          <div style={{ marginTop: "1.5rem" }}>
-            <GrilleCommanditaires
-              liste={COMMANDITAIRES.secondaires}
-              etiquette="Partenaire Argent"
-              colonnes="grid--2"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* ===== Bronze ===== */}
-      <section className="section">
-        <div className="wrap">
-          <p className="surtitre center">Partenaires Bronze</p>
-          <div style={{ marginTop: "1.5rem" }}>
-            <GrilleCommanditaires
-              liste={COMMANDITAIRES.bronze}
-              etiquette="Partenaire Bronze"
-            />
-          </div>
-        </div>
-        <div style={{ marginTop: "3rem" }}>
-          <BandeauDefilant liste={COMMANDITAIRES.bronze} />
-        </div>
-      </section>
-
-      {/* ===== Dons matériels ===== */}
-      <section className="section section--sand">
-        <div className="wrap">
-          <p className="surtitre center">Dons matériels</p>
-          <p className="lead center" style={{ maxWidth: 620, margin: "0 auto 2.5rem" }}>
-            Le gros lot du tirage et les prix de l’encan sont offerts par des entreprises qui ont
-            accepté de donner sans rien demander en retour.
-          </p>
-          <GrilleCommanditaires liste={COMMANDITAIRES.dons} etiquette="Don matériel" />
-          <div className="center" style={{ marginTop: "2.5rem" }}>
-            <Link className="btn btn--ghost btn--sm" href="/prix">
-              Voir les lots de l’encan
-            </Link>
-          </div>
         </div>
       </section>
 

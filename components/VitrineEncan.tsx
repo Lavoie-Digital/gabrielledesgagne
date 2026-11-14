@@ -121,7 +121,7 @@ export default function VitrineEncan({ lots }: { lots: Lot[] }) {
               <span data-compte={valeurTotale}>{new Intl.NumberFormat("fr-CA").format(valeurTotale)}</span>
               &nbsp;$
             </b>
-            <span>en prix, d’une escapade dans Charlevoix à une œuvre originale</span>
+            <span>en prix</span>
           </p>
         </div>
 

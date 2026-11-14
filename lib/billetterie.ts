@@ -46,7 +46,9 @@ export type Commande = {
   payeeLe: number | null;
   sessionId: string;
   paiementId: string;
-  nom: string;
+  nom: string; // prénom et nom, pour l’affichage
+  prenom: string;
+  nomFamille: string;
   courriel: string;
   telephone: string;
   adresse: Adresse | null;
@@ -106,6 +108,8 @@ function versCommande(id: string, d: FirebaseFirestore.DocumentData): Commande {
     sessionId: texte(d.sessionId),
     paiementId: texte(d.paiementId),
     nom: texte(d.nom),
+    prenom: texte(d.prenom),
+    nomFamille: texte(d.nomFamille),
     courriel: texte(d.courriel),
     telephone: texte(d.telephone),
     adresse: a
@@ -220,9 +224,15 @@ export async function liberer(id: string) {
 function coordonnees(session: Stripe.Checkout.Session) {
   const c = session.customer_details;
   const a = c?.address;
-  const allergies = session.custom_fields?.find((f) => f.key === "allergies")?.text?.value ?? "";
+  const champ = (cle: string) =>
+    (session.custom_fields?.find((f) => f.key === cle)?.text?.value ?? "").trim();
+  const prenom = champ("prenom");
+  const nomFamille = champ("nom");
   return {
-    nom: c?.name ?? "",
+    // Le prénom et le nom saisis ; à défaut, le nom inscrit sur la carte
+    nom: [prenom, nomFamille].filter(Boolean).join(" ") || (c?.name ?? ""),
+    prenom,
+    nomFamille,
     courriel: c?.email ?? "",
     telephone: c?.phone ?? "",
     adresse: a
@@ -235,7 +245,7 @@ function coordonnees(session: Stripe.Checkout.Session) {
           pays: a.country ?? "",
         }
       : null,
-    allergies,
+    allergies: champ("allergies"),
     sessionId: session.id,
     paiementId: typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id ?? "",
   };

@@ -40,7 +40,7 @@ const echapper = (s: string) =>
 function courrielBillets(c: Commande) {
   const { evenement, contact, billet } = CONFIG;
   const n = c.qte;
-  const prenom = c.nom.trim().split(/\s+/)[0] ?? "";
+  const prenom = c.prenom || (c.nom.trim().split(/\s+/)[0] ?? "");
   const sujet = `Vos ${n > 1 ? `${n} billets` : "billet"} pour la soirée Pour Clément (${c.numeros.join(", ")})`;
   const recu = c.recu
     ? `Votre reçu fiscal de ${argent(c.montantRecu)} (${argent(billet.montantRecuParBillet)} par billet${c.donExtra > 0 ? " + votre don" : ""}) sera émis par la Fondation En Cœur après la soirée, une fois les fonds remis, au nom et à l’adresse indiqués lors du paiement.`

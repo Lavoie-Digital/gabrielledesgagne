@@ -268,8 +268,8 @@ npm run build
   Fondation que tu peux l’utiliser ainsi.
 - **La mention sur les reçus fiscaux**, page « Faire un don », est volontairement
   prudente. Ajuste-la selon ce que la Fondation te confirmera.
-- **L’heure (18 h, accueil 17 h 30) et l’adresse de l’hôtel** sont des suppositions.
-  Corrige-les dans `lib/donnees.ts`.
+- **L’heure (accueil 17 h, souper 18 h 30) est confirmée ; l’adresse de l’hôtel** reste une supposition.
+  Corrige-la dans `lib/donnees.ts`.
 - **Firebase** : les quatre étapes d’activation plus haut, et les variables du
   fichier `.env` recopiées chez l’hébergeur.
 

@@ -131,25 +131,10 @@ export default async function Accueil() {
             <p className="soiree__lieu" data-reveal>
               {evenement.lieu} &middot; {evenement.adresse}
             </p>
+            <Link className="btn btn--primary soiree__cta" href="/billets" data-reveal>
+              Réserver ma place
+            </Link>
           </div>
-        </div>
-      </section>
-
-      {/* ============ LE BANDEAU PHOTO ============ */}
-      <section className="bandeau-photo" aria-label="La salle">
-        <div className="bandeau-photo__image" data-parallax="12">
-          <Image
-            src="/images/soiree/salle.jpg"
-            alt="Une salle de réception dressée pour un souper"
-            fill
-            sizes="100vw"
-          />
-        </div>
-        <div className="wrap bandeau-photo__texte">
-          <p data-lignes>
-            Deux cents chaises, autant de raisons d’y croire.
-          </p>
-          <Link className="btn btn--light" href="/billets">Réserver ma place</Link>
         </div>
       </section>
 

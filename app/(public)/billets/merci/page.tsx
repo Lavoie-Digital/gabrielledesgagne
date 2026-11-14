@@ -72,7 +72,7 @@ export default async function Merci({ searchParams }: { searchParams: Promise<{ 
       <section className="section">
         <div className="wrap" style={{ maxWidth: 720, paddingTop: "3rem" }}>
           <p className="surtitre">Paiement reçu</p>
-          <h1>Merci{commande.nom ? `, ${commande.nom.split(" ")[0]}` : ""} !</h1>
+          <h1>Merci{commande.prenom ? `, ${commande.prenom}` : ""} !</h1>
           <p className="lead" style={{ marginTop: "1rem" }}>
             {n > 1 ? `Vos ${n} billets sont confirmés.` : "Votre billet est confirmé."} Gardez cette
             page ou imprimez-la : à l’accueil, il suffit de donner votre nom ou un numéro de

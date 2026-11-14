@@ -28,8 +28,8 @@ export default function Don() {
         surtitre="En mémoire de Clément"
         titre="Faire un don"
         texte="Vous n’avez pas besoin d’être là le 12 novembre pour faire une différence. Chaque don va directement aux familles qui veillent un enfant au cœur fragile."
-        image="/images/clement-coeur.jpg"
-        alt="Le nœud papillon de l’ourson de Clément, et son cœur de cristal"
+        image="/images/clement-portrait.jpg"
+        alt="L’ourson de Clément, son nœud papillon au cœur de cristal, entouré de fleurs blanches"
       />
 
       <section className="section" id="donner">

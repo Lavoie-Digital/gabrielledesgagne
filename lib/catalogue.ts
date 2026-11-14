@@ -129,11 +129,16 @@ export const lotsPublics = unstable_cache(async () => (await lotsEnDirect()).lot
   revalidate: 60,
 });
 
+/* Sans vrais commanditaires, le public ne voit pas de fausses places
+   « Partenaire Argent » ou « Partenaire Bronze » : ces sections se cachent.
+   Seule la place du présentateur garde son exemple « Votre entreprise ici ». */
+const REPLI: Commanditaires = { ...COMMANDITAIRES, secondaires: [], bronze: [] };
+
 async function commanditairesFrais(): Promise<Commanditaires> {
-  if (!firebaseConfigure) return COMMANDITAIRES;
+  if (!firebaseConfigure) return REPLI;
   try {
     const liste = await lireCommanditaires();
-    if (!liste.length) return COMMANDITAIRES;
+    if (!liste.length) return REPLI;
     const du = (p: Palier) => liste.filter((c) => c.palier === p);
     return {
       // Sans partenaire Or, on garde la place « Votre entreprise ici »
@@ -144,7 +149,7 @@ async function commanditairesFrais(): Promise<Commanditaires> {
     };
   } catch (e) {
     avertir("commanditaires", e);
-    return COMMANDITAIRES;
+    return REPLI;
   }
 }
 
