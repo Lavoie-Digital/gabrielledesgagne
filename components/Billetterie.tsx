@@ -44,7 +44,7 @@ export default function Billetterie({ restantes, ouverte }: { restantes: number 
       <input type="hidden" name="qte" value={qte} />
       <input type="hidden" name="don" value={don} />
 
-      {restantes !== null && restantes <= 40 && (
+      {ouverte && restantes !== null && restantes <= 40 && (
         <p className="places-restantes">
           Plus que {restantes} {restantes > 1 ? "places" : "place"} disponibles
         </p>

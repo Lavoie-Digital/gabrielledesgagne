@@ -163,7 +163,21 @@ export async function placesRestantes(): Promise<number> {
 
 export type Reservation =
   | { ok: true; id: string; expireA: number }
-  | { ok: false; restantes: number };
+  | { ok: false; restantes: number; fermee?: boolean };
+
+/* ----------------------------------------------------------------------
+   Ouverture de la billetterie, contrôlée depuis l’espace privé.
+   Fermée tant qu’on ne l’a pas ouverte explicitement.
+   ---------------------------------------------------------------------- */
+
+export async function billetterieOuverte(): Promise<boolean> {
+  const d = await db().doc(PARAMETRES).get();
+  return d.data()?.ouverte === true;
+}
+
+export async function changerOuverture(ouverte: boolean, par: string) {
+  await db().doc(PARAMETRES).set({ ouverte, ouvertureModifieeLe: Date.now(), ouvertureModifieePar: par }, { merge: true });
+}
 
 export async function reserver(qte: number, donExtra: number, recu: boolean): Promise<Reservation> {
   const base = db();
@@ -174,7 +188,9 @@ export async function reserver(qte: number, donExtra: number, recu: boolean): Pr
     // Lire puis écrire le document « parametres » dans chaque réservation
     // force Firestore à les traiter une à la fois : deux personnes qui
     // prennent les dernières places au même instant ne passent pas toutes les deux.
-    await t.get(parametres);
+    const p = await t.get(parametres);
+    // Vérifiée ici aussi : une fermeture prend effet même pour qui avait déjà la page ouverte
+    if (p.data()?.ouverte !== true) return { ok: false, restantes: 0, fermee: true } as const;
     const snap = await t.get(ouvertes);
     const maintenant = Date.now();
     const prises = snap.docs.reduce((s, d) => s + occupe(d.data(), maintenant), 0);

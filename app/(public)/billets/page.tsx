@@ -3,7 +3,7 @@ import EnTete from "@/components/EnTete";
 import Link from "next/link";
 import Billetterie from "@/components/Billetterie";
 import Footer from "@/components/Footer";
-import { placesRestantes } from "@/lib/billetterie";
+import { billetterieOuverte, placesRestantes } from "@/lib/billetterie";
 import { CONFIG, argent } from "@/lib/donnees";
 import { firebaseConfigure } from "@/lib/firebase-admin";
 import { stripeConfigure } from "@/lib/stripe";
@@ -19,7 +19,12 @@ export const dynamic = "force-dynamic";
 
 export default async function Billets() {
   const { evenement, contact, billet } = CONFIG;
-  const restantes = firebaseConfigure ? await placesRestantes().catch(() => null) : null;
+  const [restantes, ouverte] = firebaseConfigure
+    ? await Promise.all([
+        placesRestantes().catch(() => null),
+        billetterieOuverte().catch(() => false),
+      ])
+    : [null, false];
 
   return (
     <>
@@ -53,7 +58,7 @@ export default async function Billets() {
                   <li><b>L’accès à l’encan silencieux</b> et au tirage du gros lot</li>
                 </ul>
 
-                <Billetterie restantes={restantes} ouverte={stripeConfigure && firebaseConfigure} />
+                <Billetterie restantes={restantes} ouverte={ouverte && stripeConfigure} />
               </div>
             </div>
 

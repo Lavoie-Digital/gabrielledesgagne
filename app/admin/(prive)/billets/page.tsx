@@ -1,4 +1,5 @@
-import { lireCommandes, placesEnCoursDePaiement, type Adresse, type Commande } from "@/lib/billetterie";
+import { basculerBilletterie } from "@/app/admin/(prive)/billets/actions";
+import { billetterieOuverte, lireCommandes, placesEnCoursDePaiement, type Adresse, type Commande } from "@/lib/billetterie";
 import { lireDons, type Don } from "@/lib/dons";
 import { CONFIG, argent } from "@/lib/donnees";
 import BoutonRenvoyer from "@/components/admin/BoutonRenvoyer";
@@ -23,9 +24,10 @@ const adresse = (a: Adresse | null) =>
 export default async function Billets() {
   let commandes: Commande[] = [];
   let donsEnLigne: Don[] = [];
+  let ouverte = false;
   let erreur = "";
   try {
-    [commandes, donsEnLigne] = await Promise.all([lireCommandes(), lireDons()]);
+    [commandes, donsEnLigne, ouverte] = await Promise.all([lireCommandes(), lireDons(), billetterieOuverte()]);
   } catch (e) {
     erreur = e instanceof Error ? e.message.split("\n")[0] : String(e);
   }
@@ -65,6 +67,26 @@ export default async function Billets() {
           </div>
         )}
       </div>
+
+      <section className="adm-carte" style={{ marginBottom: "1.2rem", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
+        <div>
+          <h2 style={{ margin: 0 }}>
+            Billetterie :{" "}
+            <span style={{ color: ouverte ? "#2F5A3B" : "#9A3B2E" }}>{ouverte ? "ouverte" : "fermée"}</span>
+          </h2>
+          <p className="adm-discret" style={{ margin: ".3rem 0 0" }}>
+            {ouverte
+              ? "Le public peut acheter des billets sur /billets."
+              : "Le public voit « Billetterie bientôt ouverte » et ne peut rien acheter. Les dons restent possibles."}
+          </p>
+        </div>
+        <form action={basculerBilletterie}>
+          <input type="hidden" name="ouverte" value={ouverte ? "non" : "oui"} />
+          <button type="submit" className={ouverte ? "adm-btn adm-btn--danger" : "adm-btn adm-btn--plein"} disabled={Boolean(erreur)}>
+            {ouverte ? "Fermer la billetterie" : "Ouvrir la billetterie"}
+          </button>
+        </form>
+      </section>
 
       {!stripeConfigure && (
         <div className="adm-alerte" style={{ marginBottom: "1.2rem" }}>

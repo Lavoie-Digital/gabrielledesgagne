@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { changerOuverture } from "@/lib/billetterie";
 import { envoyerBillets } from "@/lib/envoi-billets";
 import { envoyerRemerciementDon } from "@/lib/envoi-dons";
 import { exigerAdmin } from "@/lib/session";
@@ -22,4 +23,12 @@ export async function renvoyerBillets(_: RetourEnvoi, form: FormData): Promise<R
     revalidatePath("/admin/billets");
     return { ok: false, message: e instanceof Error ? e.message.slice(0, 120) : "Échec de l’envoi" };
   }
+}
+
+/* Ouvrir ou fermer la billetterie */
+export async function basculerBilletterie(form: FormData) {
+  const admin = await exigerAdmin();
+  await changerOuverture(form.get("ouverte") === "oui", admin.courriel);
+  revalidatePath("/admin/billets");
+  revalidatePath("/billets");
 }

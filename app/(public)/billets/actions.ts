@@ -51,6 +51,9 @@ export async function passerAuPaiement(_: EtatPaiement, form: FormData): Promise
     console.error("[billetterie] réservation impossible", e);
     return { message: "Un problème technique empêche la réservation. Réessayez dans un instant." };
   }
+  if (!reservation.ok && reservation.fermee) {
+    return { message: "La billetterie n’est pas encore ouverte. Revenez bientôt !" };
+  }
   if (!reservation.ok) {
     return {
       message:
