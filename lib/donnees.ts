@@ -30,8 +30,8 @@ export const CONFIG = {
   evenement: {
     nom: "Pour Clément",
     date: "Vendredi 12 novembre 2027",
-    dateISO: "2027-11-12T18:00:00",   // sert au compte à rebours (18 h)
-    heure: "18 h, accueil dès 17 h 30",
+    dateISO: "2027-11-12T17:00:00",   // sert au compte à rebours (17 h, accueil)
+    heure: "Accueil dès 17 h, souper à 18 h 30",
     lieu: "Hôtel Plaza Québec",
     adresse: "3031, boulevard Laurier, Québec (Québec)",
     tenue: "Tenue de ville",

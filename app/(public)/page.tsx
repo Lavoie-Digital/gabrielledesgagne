@@ -10,12 +10,12 @@ import { CONFIG } from "@/lib/donnees";
 
 const MOMENTS = [
   {
-    quand: "17 h 30",
+    quand: "17 h",
     quoi: "L’accueil",
     texte: "Un cocktail de bienvenue et des bouchées, le temps de trouver sa table et de faire connaissance.",
   },
   {
-    quand: "18 h",
+    quand: "18 h 30",
     quoi: "Le souper",
     texte: "Un repas quatre services servi à table, deux consommations, et des voisins de table qui ne le resteront pas longtemps.",
   },
@@ -26,8 +26,8 @@ const MOMENTS = [
   },
   {
     quand: "En fin de soirée",
-    quoi: "Le tirage",
-    texte: "Le gros lot est tiré dans la salle. Quelqu’un repart les bras pleins, tout le monde repart le cœur plein.",
+    quoi: "Musicien et grand tirage",
+    texte: "Un musicien prend le relais, puis le gros lot est tiré dans la salle. Quelqu’un repart les bras pleins, tout le monde repart le cœur plein.",
   },
 ];
 
@@ -64,29 +64,23 @@ export default async function Accueil() {
 
           <div className="recit__texte">
             <p className="premiere" data-reveal>
-              Clément est né avec une malformation cardiaque. Nous avons passé le temps qui a
-              suivi dans un hôpital, à apprendre un vocabulaire que personne ne devrait avoir à
-              apprendre, entourés d’équipes qui se sont battues autant que lui. Son cœur n’a pas
-              tenu.
+              Le 17 février 2024, Clément est né avec une malformation cardiaque. Malgré le
+              dévouement et tout le savoir-faire des équipes médicales, son petit cœur a livré
+              un combat qu’il ne pouvait pas gagner.
             </p>
             <p data-reveal>
-              Dans ces couloirs-là, il y a d’autres parents. Certains viennent de loin, dorment à
-              l’hôtel, comptent les jours et les dollars entre deux rendez-vous. Personne ne
-              devrait avoir à porter ça seul, et pourtant beaucoup le font.
+              Son passage a été bref. Son empreinte ne s’effacera pas. Clément nous a appris à
+              mesurer la valeur d’une seule journée, la force d’une main que l’on tient, la
+              beauté de ce qu’on croyait ordinaire.
             </p>
             <blockquote className="recit__exergue" data-lignes>
-              L’ourson qui garde Clément porte un petit cœur sur son nœud papillon. Celui de la
-              soirée, c’est vous.
+              « Il nous a montré, en si peu de temps, à quel point la vie mérite d’être aimée. »
             </blockquote>
             <p data-reveal>
-              Le 12 novembre, on se réunit. Il y aura un bon repas, un encan silencieux, un
-              tirage, et une salle pleine de gens qui ne se connaissent pas encore. Tout ce qui
-              sera amassé ira à la Fondation En Cœur, qui accompagne ces familles au quotidien,
-              partout au Québec.
-            </p>
-            <p data-reveal>
-              Merci d’avance d’en être. C’est une drôle de façon de dire je t’aime à un enfant qui
-              n’est plus là, mais c’est la mienne.
+              Cette soirée est en sa mémoire. Mais elle est aussi, et surtout, pour toutes les
+              familles qui, en ce moment même, veillent au chevet d’un enfant au cœur fragile :
+              pour qu’elles trouvent un peu de répit, un peu de chaleur, et la certitude
+              qu’elles ne portent pas cela seules.
             </p>
             <p className="signature" data-reveal>
               Gabrielle Desgagné, maman de Clément

@@ -143,7 +143,7 @@ export default function Ouverture() {
         <p className="ecran__infos" data-entree>
           <span>{evenement.date}</span>
           <i aria-hidden="true" />
-          <span>Dès 17 h 30</span>
+          <span>Dès 17 h</span>
           <i aria-hidden="true" />
           <span>{evenement.lieu}</span>
         </p>
