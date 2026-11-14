@@ -49,15 +49,26 @@ export default function FormLot({
               </select>
             </label>
             <label className="adm-champ">
-              <span>Offert par</span>
-              <input name="donateur" defaultValue={lot?.donateur} placeholder="Nom de l’entreprise" />
+              <span>Nom de l’entreprise</span>
+              <input name="donateur" defaultValue={lot?.donateur} placeholder="Germain Hôtels" />
             </label>
           </div>
 
           <label className="adm-champ">
-            <span>Description</span>
+            <span>Description du prix</span>
             <textarea name="description" rows={4} defaultValue={lot?.description}
               placeholder="Deux ou trois phrases : ce qui est inclus, les conditions." />
+          </label>
+
+          <label className="adm-champ">
+            <span>Description de l’entreprise</span>
+            <textarea name="descriptionEntreprise" rows={5} defaultValue={lot?.descriptionEntreprise}
+              placeholder="Le texte de présentation de l’entreprise, affiché dans la fiche du lot." />
+          </label>
+
+          <label className="adm-champ">
+            <span>Site Web de l’entreprise</span>
+            <input name="siteEntreprise" type="url" defaultValue={lot?.siteEntreprise} placeholder="https://…" />
           </label>
 
           <div className="adm-form__trois">

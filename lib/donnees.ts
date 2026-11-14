@@ -74,19 +74,20 @@ export const CONFIG = {
     donsSuggeres: [25, 50, 100, 250],
   },
 
+  /* --- Les dons en ligne (page Faire un don, paiement Stripe) --- */
+  don: {
+    // Montants proposés (en dollars)
+    suggeres: [20, 50, 100, 250],
+    minimum: 5,
+    maximum: 25000,
+  },
+
   /* ---------------------------------------------------------------------
      LIENS À REMPLACER  ← LE PLUS IMPORTANT
      Tant qu’un lien reste vide (""), le site affiche poliment
      « bientôt disponible » au lieu d’un bouton brisé.
      --------------------------------------------------------------------- */
   liens: {
-    // Formulaire de don Zeffy, version « page »
-    don: "",
-
-    // Formulaire de don Zeffy, version « intégrée » (embed) pour l’afficher
-    // directement dans la page Faire un don
-    donIntegre: "",
-
     // Plateforme où les gens misent réellement. Si vous laissez ce champ
     // vide, chaque lot peut avoir son propre lien (voir « lienMise » plus bas).
     encan: "",
@@ -230,6 +231,9 @@ export type Lot = {
   // « remplir » : l’image occupe tout le cadre, quitte à rogner les bords (photos)
   cadrage?: "entier" | "remplir";
   lienMise: string;
+  // L’entreprise qui offre le lot : sa présentation et son site Web
+  descriptionEntreprise?: string;
+  siteEntreprise?: string;
 };
 
 export const LOTS: Lot[] = [

@@ -1,11 +1,21 @@
 import type Stripe from "stripe";
 import { confirmerPaiement, liberer, marquerEnTraitement } from "@/lib/billetterie";
+import { confirmerDon, expirerDon } from "@/lib/dons";
 import { envoyerBillets } from "@/lib/envoi-billets";
+import { envoyerRemerciementDon } from "@/lib/envoi-dons";
 import { stripe } from "@/lib/stripe";
+
+/* Un don de la page « Faire un don », ou une commande de billets */
+const estUnDon = (session: Stripe.Checkout.Session) => session.metadata?.type === "don";
 
 /* Confirme le paiement puis envoie les billets par courriel. Si SendGrid
    échoue, l’erreur remonte : Stripe renverra l’événement plus tard. */
 async function confirmerEtEnvoyer(session: Stripe.Checkout.Session) {
+  if (estUnDon(session)) {
+    const don = await confirmerDon(session);
+    if (don?.statut === "payee") await envoyerRemerciementDon(don.id);
+    return;
+  }
   const commande = await confirmerPaiement(session);
   if (commande?.statut === "payee") await envoyerBillets(commande.id);
 }
@@ -44,7 +54,7 @@ export async function POST(request: Request) {
         const session = evenement.data.object;
         if (session.payment_status === "paid" || session.payment_status === "no_payment_required") {
           await confirmerEtEnvoyer(session);
-        } else {
+        } else if (!estUnDon(session)) {
           await marquerEnTraitement(session);
         }
         break;
@@ -54,8 +64,9 @@ export async function POST(request: Request) {
         break;
       case "checkout.session.async_payment_failed":
       case "checkout.session.expired": {
-        const id = evenement.data.object.client_reference_id;
-        if (id) await liberer(id);
+        const session = evenement.data.object;
+        const id = session.client_reference_id;
+        if (id) await (estUnDon(session) ? expirerDon(id) : liberer(id));
         break;
       }
     }

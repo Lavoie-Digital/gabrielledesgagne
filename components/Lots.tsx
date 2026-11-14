@@ -156,6 +156,12 @@ export default function Lots({ lots }: { lots: Lot[] }) {
               <p className="lot__value" style={{ marginTop: ".8rem" }}>
                 Valeur au détail : <b>{argent(lot.valeur)}</b>
               </p>
+
+              {lot.siteEntreprise && (
+                <a className="lot__site" href={lot.siteEntreprise} target="_blank" rel="noopener">
+                  Accéder au site Web{lot.donateur ? ` de ${lot.donateur}` : ""} ↗
+                </a>
+              )}
             </div>
           </article>
         ))}
@@ -215,10 +221,21 @@ function FicheLot({
 
         <div className="modal__body">
           <p>{lot.description}</p>
-          <div className="modal__row"><span>Offert par</span><b>{lot.donateur}</b></div>
-          <div className="modal__row"><span>Valeur au détail</span><b>{argent(lot.valeur)}</b></div>
-          <div className="modal__row"><span>Mise de départ</span><b>{argent(lot.miseDepart)}</b></div>
           <div className="modal__row"><span>Mise actuelle</span><b>{argent(lot.miseActuelle)}</b></div>
+
+          {(lot.donateur || lot.descriptionEntreprise || lot.siteEntreprise) && (
+            <div className="modal__entreprise">
+              {lot.donateur && <p className="modal__entreprise-nom">Offert par {lot.donateur}</p>}
+              {lot.descriptionEntreprise && (
+                <p className="modal__entreprise-texte">{lot.descriptionEntreprise}</p>
+              )}
+              {lot.siteEntreprise && (
+                <a className="btn btn--ghost btn--sm" href={lot.siteEntreprise} target="_blank" rel="noopener">
+                  Accéder au site Web ↗
+                </a>
+              )}
+            </div>
+          )}
 
           <div style={{ marginTop: "1.5rem" }}>
             {peutMiser ? (

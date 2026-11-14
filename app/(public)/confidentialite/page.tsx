@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import EnTete from "@/components/EnTete";
 import Footer from "@/components/Footer";
 import { CONFIG } from "@/lib/donnees";
@@ -105,8 +104,8 @@ export default function Confidentialite() {
             <h3>Quand vous réservez un billet, faites un don ou misez</h3>
             <p>
               Les paiements se font sur des plateformes spécialisées : Stripe pour la
-              billetterie, Zeffy pour les dons faits sur la page « Faire un don », et la
-              plateforme d’encan indiquée sur la page des prix. Elles recueillent votre nom, vos
+              billetterie et les dons faits sur la page « Faire un don », et la plateforme
+              d’encan indiquée sur la page des prix. Elles recueillent votre nom, vos
               coordonnées et les renseignements de paiement. Nous ne voyons jamais votre numéro
               de carte. Nous recevons de ces plateformes votre nom, votre courriel, votre
               téléphone, le nombre de billets et vos numéros de billets, le montant de votre
@@ -167,9 +166,9 @@ export default function Confidentialite() {
             </p>
             <ul className="liste">
               <li>
-                Le formulaire de don intégré à la page{" "}
-                <Link href="/don">Faire un don</Link> est fourni par Zeffy, qui peut déposer ses
-                propres témoins, nécessaires au paiement, selon sa politique.
+                Pour payer un billet ou faire un don, vous êtes dirigé vers la page de paiement
+                de Stripe, qui peut déposer ses propres témoins, nécessaires au paiement et à la
+                prévention de la fraude, selon sa politique.
               </li>
               <li>
                 L’espace privé, réservé aux organisatrices et organisateurs, utilise un témoin de
@@ -185,8 +184,7 @@ export default function Confidentialite() {
             <ul className="liste">
               <li><b>la Fondation En Cœur</b>, pour les dons et les reçus fiscaux ;</li>
               <li>
-                <b>Stripe</b>, <b>Zeffy</b> et la <b>plateforme d’encan</b>, qui traitent les
-                paiements ;
+                <b>Stripe</b> et la <b>plateforme d’encan</b>, qui traitent les paiements ;
               </li>
               <li>
                 <b>l’hôtel et le traiteur</b>, pour la liste des invités, le plan de salle et les

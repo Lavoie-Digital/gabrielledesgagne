@@ -221,7 +221,7 @@ export async function liberer(id: string) {
    le travail qu’une seule fois, peu importe laquelle arrive en premier.
    ---------------------------------------------------------------------- */
 
-function coordonnees(session: Stripe.Checkout.Session) {
+export function coordonnees(session: Stripe.Checkout.Session) {
   const c = session.customer_details;
   const a = c?.address;
   const champ = (cle: string) =>

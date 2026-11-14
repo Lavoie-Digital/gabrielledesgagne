@@ -790,6 +790,8 @@ a.sponsor-card:hover{ transform:translateY(-3px); box-shadow:var(--soft-2); }
 }
 .lot__bid-meta{ font-size:.7rem; color:var(--ink-soft); text-align:right; }
 .lot__value{ font-size:.76rem; color:var(--ink-soft); }
+.lot__site{ display:inline-block; margin-top:.5rem; font-size:.82rem; font-weight:700; color:var(--clay-deep); text-decoration:underline; text-underline-offset:3px; }
+.lot__site:hover{ color:var(--ink); }
 
 /* ---------- L’image d’un lot (components/ImageLot.tsx) ---------- */
 .image-lot{ position:absolute; inset:0; overflow:hidden; }
@@ -821,6 +823,9 @@ a.sponsor-card:hover{ transform:translateY(-3px); box-shadow:var(--soft-2); }
 .modal__row{ display:flex; justify-content:space-between; gap:1rem; padding:.6rem 0; border-bottom:1px solid var(--line); font-size:.94rem; }
 .modal__row:last-of-type{ border-bottom:0; }
 .modal__row b{ color:var(--ink); }
+.modal__entreprise{ margin-top:1.4rem; padding-top:1.3rem; border-top:1px solid var(--line); }
+.modal__entreprise-nom{ font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--ink-soft); margin:0 0 .6rem; }
+.modal__entreprise-texte{ font-size:.94rem; white-space:pre-line; margin:0 0 1rem; }
 
 /* ---------- Encadrés ---------- */
 .notice{
@@ -887,12 +892,6 @@ a.sponsor-card:hover{ transform:translateY(-3px); box-shadow:var(--soft-2); }
   font-variant-numeric:lining-nums;
 }
 .amount-grid span{ display:block; font-size:.7rem; color:var(--ink-soft); margin-top:.35rem; line-height:1.35; }
-.embed-frame{ background:#fff; border:1px solid var(--line); border-radius:12px; box-shadow:var(--soft-2); overflow:hidden; min-height:640px; }
-.embed-frame iframe{ width:100%; min-height:640px; border:0; display:block; }
-.embed-placeholder{
-  min-height:420px; display:grid; place-items:center; text-align:center; padding:2.5rem;
-  background:#fff; border:1px dashed var(--sage); border-radius:12px;
-}
 
 /* ---------- Politique de confidentialité ---------- */
 .politique{ display:grid; grid-template-columns:240px minmax(0,1fr); gap:clamp(2rem,5vw,4.5rem); align-items:start; }

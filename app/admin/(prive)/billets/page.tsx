@@ -1,10 +1,11 @@
 import { lireCommandes, placesEnCoursDePaiement, type Adresse, type Commande } from "@/lib/billetterie";
+import { lireDons, type Don } from "@/lib/dons";
 import { CONFIG, argent } from "@/lib/donnees";
 import BoutonRenvoyer from "@/components/admin/BoutonRenvoyer";
 import { courrielConfigure } from "@/lib/courriel";
 import { stripeConfigure } from "@/lib/stripe";
 
-export const metadata = { title: "Billets et reçus" };
+export const metadata = { title: "Billets, dons et reçus" };
 export const dynamic = "force-dynamic";
 
 const date = (ms: number | null) =>
@@ -21,9 +22,10 @@ const adresse = (a: Adresse | null) =>
 
 export default async function Billets() {
   let commandes: Commande[] = [];
+  let donsEnLigne: Don[] = [];
   let erreur = "";
   try {
-    commandes = await lireCommandes();
+    [commandes, donsEnLigne] = await Promise.all([lireCommandes(), lireDons()]);
   } catch (e) {
     erreur = e instanceof Error ? e.message.split("\n")[0] : String(e);
   }
@@ -34,16 +36,31 @@ export default async function Billets() {
   const revenus = payees.reduce((s, c) => s + c.total, 0);
   const dons = payees.filter((c) => c.donExtra > 0);
   const totalDons = dons.reduce((s, c) => s + c.donExtra, 0);
-  const recus = payees.filter((c) => c.recu);
-  const totalRecus = recus.reduce((s, c) => s + c.montantRecu, 0);
+  const donsPayes = donsEnLigne.filter((d) => d.statut === "payee");
+  const totalDonsEnLigne = donsPayes.reduce((s, d) => s + d.montant, 0);
+
+  // Tous les reçus à faire émettre : billets (90 $ par billet + don) et dons en ligne
+  const recus = [
+    ...payees.filter((c) => c.recu).map((c) => ({
+      id: c.id, provenance: "Billets", nom: c.nom, courriel: c.courriel, adresse: c.adresse,
+      detail: `${c.qte} billet${c.qte > 1 ? "s" : ""}${c.donExtra ? ` + don ${argent(c.donExtra)}` : ""}`,
+      montant: c.montantRecu, le: c.payeeLe ?? 0,
+    })),
+    ...donsPayes.filter((d) => d.recu).map((d) => ({
+      id: d.id, provenance: "Don", nom: d.nom, courriel: d.courriel, adresse: d.adresse,
+      detail: "Don en ligne", montant: d.montant, le: d.payeeLe ?? 0,
+    })),
+  ].sort((a, b) => a.le - b.le);
+  const totalRecus = recus.reduce((s, r) => s + r.montant, 0);
 
   return (
     <>
       <div className="adm-titre">
-        <h1>Billets et reçus</h1>
-        {payees.length > 0 && (
+        <h1>Billets, dons et reçus</h1>
+        {(payees.length > 0 || donsPayes.length > 0) && (
           <div className="adm-rangee" style={{ marginTop: 0 }}>
             <a className="adm-btn" href="/admin/export?quoi=billets">Exporter les billets (CSV)</a>
+            <a className="adm-btn" href="/admin/export?quoi=dons">Exporter les dons (CSV)</a>
             <a className="adm-btn adm-btn--plein" href="/admin/export?quoi=recus">Exporter les reçus (CSV)</a>
           </div>
         )}
@@ -71,16 +88,17 @@ export default async function Billets() {
       <div className="adm-chiffres">
         <div><b>{vendus} / {CONFIG.billet.limite}</b><span>billets vendus en ligne</span></div>
         <div><b>{reserves}</b><span>places en cours de paiement</span></div>
-        <div><b>{argent(revenus)}</b><span>encaissé en ligne</span></div>
-        <div><b>{dons.length}</b><span>dons supplémentaires · {argent(totalDons)}</span></div>
+        <div><b>{argent(revenus + totalDonsEnLigne)}</b><span>encaissé en ligne (billets et dons)</span></div>
+        <div><b>{donsPayes.length}</b><span>dons en ligne · {argent(totalDonsEnLigne)}</span></div>
+        <div><b>{dons.length}</b><span>dons ajoutés aux billets · {argent(totalDons)}</span></div>
         <div><b>{recus.length}</b><span>reçus fiscaux à émettre · {argent(totalRecus)}</span></div>
       </div>
 
       <section className="adm-section">
         <h2>Reçus fiscaux à faire émettre par la Fondation</h2>
         <p className="adm-discret" style={{ maxWidth: "70ch" }}>
-          Montant du reçu : {argent(CONFIG.billet.montantRecuParBillet)} par billet, plus le don
-          supplémentaire. À transmettre à la Fondation En Cœur après la soirée, avec la remise des fonds.
+          Billets : {argent(CONFIG.billet.montantRecuParBillet)} par billet, plus le don ajouté.
+          Dons en ligne : le montant complet du don. À transmettre à la Fondation En Cœur après la soirée, avec la remise des fonds.
         </p>
         {recus.length === 0 ? (
           <p className="adm-discret">Aucune demande de reçu pour l’instant.</p>
@@ -90,19 +108,17 @@ export default async function Billets() {
               <tr>
                 <th>Nom</th>
                 <th>Adresse</th>
-                <th className="nb">Billets</th>
-                <th className="nb">Don extra</th>
+                <th>Provenance</th>
                 <th className="nb">Montant du reçu</th>
               </tr>
             </thead>
             <tbody>
-              {recus.map((c) => (
-                <tr key={c.id}>
-                  <td>{c.nom}<small>{c.courriel}</small></td>
-                  <td>{adresse(c.adresse)}</td>
-                  <td className="nb">{c.qte}</td>
-                  <td className="nb">{c.donExtra ? argent(c.donExtra) : "—"}</td>
-                  <td className="nb"><b>{argent(c.montantRecu)}</b></td>
+              {recus.map((r) => (
+                <tr key={r.id}>
+                  <td>{r.nom}<small>{r.courriel}</small></td>
+                  <td>{adresse(r.adresse)}</td>
+                  <td>{r.provenance}<small>{r.detail}</small></td>
+                  <td className="nb"><b>{argent(r.montant)}</b></td>
                 </tr>
               ))}
             </tbody>
@@ -111,7 +127,46 @@ export default async function Billets() {
       </section>
 
       <section className="adm-section">
-        <h2>Dons supplémentaires</h2>
+        <h2>Dons en ligne (page « Faire un don »)</h2>
+        {donsPayes.length === 0 ? (
+          <p className="adm-discret">Aucun don en ligne pour l’instant.</p>
+        ) : (
+          <table className="adm-table">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Courriel</th>
+                <th>Reçu demandé</th>
+                <th className="nb">Don</th>
+                <th>Courriel de remerciement</th>
+              </tr>
+            </thead>
+            <tbody>
+              {donsPayes.map((d) => (
+                <tr key={d.id}>
+                  <td>{d.nom}<small>{date(d.payeeLe)}</small></td>
+                  <td>{d.courriel}</td>
+                  <td>{d.recu ? "Oui" : "Non"}</td>
+                  <td className="nb">{argent(d.montant)}</td>
+                  <td>
+                    {d.courrielEnvoyeLe ? (
+                      <small>Envoyé {date(d.courrielEnvoyeLe)}</small>
+                    ) : d.courrielErreur ? (
+                      <small style={{ color: "#7A3226" }} title={d.courrielErreur}>Échec de l’envoi</small>
+                    ) : (
+                      <small>Pas encore envoyé</small>
+                    )}
+                    {courrielConfigure && <BoutonRenvoyer id={d.id} type="don" dejaEnvoye={Boolean(d.courrielEnvoyeLe)} />}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      <section className="adm-section">
+        <h2>Dons ajoutés aux billets</h2>
         {dons.length === 0 ? (
           <p className="adm-discret">Aucun don supplémentaire pour l’instant.</p>
         ) : (

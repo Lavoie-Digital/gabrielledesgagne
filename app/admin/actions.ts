@@ -172,6 +172,8 @@ export async function enregistrerLot(_: Retour, f: FormData): Promise<Retour> {
     miseActuelle: montant(f, "miseActuelle"),
     nbMises: Math.round(montant(f, "nbMises")),
     lienMise: champ(f, "lienMise"),
+    descriptionEntreprise: champ(f, "descriptionEntreprise"),
+    siteEntreprise: champ(f, "siteEntreprise"),
     cadrage: champ(f, "cadrage") === "remplir" ? "remplir" : "entier",
     ordre: montant(f, "ordre"),
   };
@@ -189,6 +191,9 @@ export async function enregistrerLot(_: Retour, f: FormData): Promise<Retour> {
   }
   if (!lienValide(lot.lienMise)) {
     return { ok: false, message: "Le lien pour miser doit commencer par https://" };
+  }
+  if (!lienValide(lot.siteEntreprise)) {
+    return { ok: false, message: "Le site Web de l’entreprise doit commencer par https://" };
   }
   // Tant que personne n’a misé, la mise actuelle suit la mise de départ
   if (lot.nbMises === 0 && lot.miseActuelle < lot.miseDepart) lot.miseActuelle = lot.miseDepart;

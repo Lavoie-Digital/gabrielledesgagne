@@ -4,6 +4,8 @@ import Link from "next/link";
 import Footer from "@/components/Footer";
 import FormulaireDon from "@/components/FormulaireDon";
 import { CONFIG } from "@/lib/donnees";
+import { firebaseConfigure } from "@/lib/firebase-admin";
+import { stripeConfigure } from "@/lib/stripe";
 
 export const metadata: Metadata = {
   title: "Faire un don",
@@ -18,10 +20,11 @@ const MONTANTS = [
   ["250 $", "Une semaine de stationnement et de repas"],
 ];
 
-export default function Don() {
-  const lienDon = CONFIG.liens.don || "#donner";
-  const externe = Boolean(CONFIG.liens.don);
+/* Les clés Stripe ne sont lues qu’à l’exécution (secrets App Hosting) :
+   la page ne doit pas être figée au moment de la compilation */
+export const dynamic = "force-dynamic";
 
+export default function Don() {
   return (
     <>
       <EnTete
@@ -48,11 +51,7 @@ export default function Don() {
 
               <div className="amount-grid" style={{ marginTop: "1.8rem" }}>
                 {MONTANTS.map(([montant, texte]) => (
-                  <a
-                    key={montant}
-                    href={lienDon}
-                    {...(externe ? { target: "_blank", rel: "noopener" } : {})}
-                  >
+                  <a key={montant} href="#formulaire-don">
                     <b>{montant}</b>
                     <span>{texte}</span>
                   </a>
@@ -60,9 +59,10 @@ export default function Don() {
               </div>
 
               <div className="notice">
-                <strong>Un mot sur les reçus fiscaux.</strong> Les dons sont traités par la
-                Fondation En Cœur, un organisme de bienfaisance enregistré. Les modalités
-                d’émission des reçus vous seront confirmées au moment de votre don.
+                <strong>Un mot sur les reçus fiscaux.</strong> Tous les dons sont remis à la
+                Fondation En Cœur, un organisme de bienfaisance enregistré. Si vous cochez « Je
+                souhaite un reçu fiscal », la Fondation vous l’émettra pour le montant complet de
+                votre don, après la soirée, une fois les fonds remis.
               </div>
 
               <div data-reveal className="card" style={{ marginTop: "1.6rem" }}>
@@ -82,11 +82,7 @@ export default function Don() {
             <div>
               <p className="surtitre">Don sécurisé en ligne</p>
               <h2 style={{ marginBottom: "1.2rem" }}>Votre don, en deux minutes</h2>
-              <FormulaireDon />
-              <p style={{ fontSize: ".84rem", color: "var(--ink-soft)", marginTop: "1rem", textAlign: "center" }}>
-                Le formulaire est hébergé par Zeffy, une plateforme sans frais pour les
-                organismes : la totalité de votre don se rend à destination.
-              </p>
+              <FormulaireDon ouvert={stripeConfigure && firebaseConfigure} />
             </div>
 
           </div>

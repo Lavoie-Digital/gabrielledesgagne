@@ -23,7 +23,8 @@ avoir à rafraîchir. Pour arrêter le serveur : `Ctrl + C` dans le terminal.
 | `/commanditaires` | Le lien « Devenez commanditaire » vers le PDF, les trois niveaux, tous les partenaires |
 | `/billets` | Ce qui est inclus, choix des billets, don supplémentaire, reçu fiscal, paiement Stripe |
 | `/billets/merci` | Les numéros de billets (L101, L102…) affichés après le paiement |
-| `/don` | Formulaire Zeffy intégré, montants suggérés, autres façons d’aider |
+| `/don` | Don en ligne par Stripe (montant, reçu fiscal), autres façons d’aider |
+| `/don/merci` | Le remerciement affiché après un don |
 | `/direct` | **La page à projeter le soir de la soirée** : les mises classées de la plus haute à la plus basse, mise à jour en continu |
 | `/admin` | **L’espace privé** : billets et reçus, lots, commanditaires et mises du soir (accès réservé) |
 
@@ -139,8 +140,6 @@ plus que d’exemples et de solution de repli.
 
 ```
 liens: {
-  don: "",           ← adresse de ton formulaire de don Zeffy
-  donIntegre: "",    ← même formulaire, version « intégrée » (embed)
   encan: "",         ← adresse de ta plateforme de mises
 }
 ```
@@ -148,9 +147,27 @@ liens: {
 Tant qu’un lien reste vide, le site affiche poliment « bientôt disponible » plutôt
 qu’un bouton brisé. Personne ne tombera dans le vide.
 
-Pour les obtenir : crée un compte gratuit sur [zeffy.com](https://www.zeffy.com/fr-CA),
-crée un formulaire de don, puis copie son adresse. (La billetterie, elle, passe par
-Stripe : voir plus bas.) Pour `donIntegre`, cherche l’option « intégrer » ou « embed » dans Zeffy.
+Les billets et les dons, eux, se paient directement sur le site par Stripe : voir
+plus bas.
+
+## Les dons : Stripe
+
+La page **Faire un don** (`/don`) sert **uniquement aux dons** : la personne choisit
+un montant (20, 50, 100, 250 $ ou un autre), peut cocher **« Je souhaite un reçu
+fiscal »**, puis paie sur la page Stripe. Stripe lui demande seulement son prénom,
+son nom, son courriel et, si elle veut un reçu, son adresse. Pas de billet, pas
+d’allergies.
+
+Elle revient sur une page de remerciement et reçoit un courriel de remerciement
+(SendGrid). Le reçu fiscal porte sur le **montant complet du don** et est émis par
+la Fondation après la soirée.
+
+Dans l’espace privé, **« Billets, dons et reçus »** liste les dons en ligne (nom,
+montant, reçu demandé), et l’export **des reçus** regroupe billets et dons. Un
+export **des dons** existe aussi. Les montants proposés se changent dans
+`lib/donnees.ts`, section `don`.
+
+Le webhook Stripe est le même que pour les billets : rien de plus à configurer.
 
 ## La billetterie : Stripe
 
