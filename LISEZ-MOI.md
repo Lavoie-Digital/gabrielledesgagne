@@ -192,7 +192,7 @@ côté 30 minutes. S’il abandonne, elles se libèrent toutes seules. Une fois 
 billets vendus, la billetterie affiche « complet ». Le nombre se change dans
 `lib/donnees.ts`, section `billet` (`limite`).
 
-**Le reçu fiscal :** 60 $ par billet (`montantRecuParBillet` dans `lib/donnees.ts`), plus le don supplémentaire. Il n’est
+**Le reçu fiscal :** 40 $ par billet (`montantRecuParBillet` dans `lib/donnees.ts`), plus le don supplémentaire. Il n’est
 **pas** émis par le site : la Fondation En Cœur l’émet **après la soirée**, une fois
 les fonds remis. Dans l’espace privé, la page **« Billets et reçus »** donne la liste
 à lui transmettre (nom, adresse, montant), avec un bouton **Exporter les reçus

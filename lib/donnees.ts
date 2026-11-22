@@ -69,7 +69,7 @@ export const CONFIG = {
     // Partie du billet admissible à un reçu fiscal (prix du billet moins la
     // valeur du repas et des consommations). Le reçu est émis par la
     // Fondation En Cœur après la soirée, une fois les fonds remis.
-    montantRecuParBillet: 60,
+    montantRecuParBillet: 40,
     // Montants proposés pour le don supplémentaire (en dollars)
     donsSuggeres: [25, 50, 100, 250],
   },
