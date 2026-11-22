@@ -24,6 +24,8 @@ export type LigneMise = {
   donateur?: string;
   valeur?: number;
   miseDepart?: number;
+  image?: string;
+  cadrage?: "entier" | "remplir";
   connu: boolean; // true si le titre correspond à un lot de lib/donnees.ts
 };
 
@@ -114,6 +116,8 @@ function depuisLeCatalogue(catalogue: Lot[]): LigneMise[] {
     donateur: l.donateur,
     valeur: l.valeur,
     miseDepart: l.miseDepart,
+    image: l.image || undefined,
+    cadrage: l.cadrage,
     connu: true,
   }));
 }
@@ -130,6 +134,8 @@ function enrichir(catalogue: Lot[], titre: string, mise: number, nbMises: number
     donateur: lot.donateur,
     valeur: lot.valeur,
     miseDepart: lot.miseDepart,
+    image: lot.image || undefined,
+    cadrage: lot.cadrage,
     connu: true,
   };
 }

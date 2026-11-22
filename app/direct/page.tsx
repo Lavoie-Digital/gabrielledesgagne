@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import TableauMises from "@/components/TableauMises";
+import "./direct.css";
 
 export const metadata: Metadata = {
   title: "Les mises en direct",
