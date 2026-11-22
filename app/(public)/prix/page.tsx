@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { metaPage } from "@/lib/seo";
-import EnTete from "@/components/EnTete";
 import Footer from "@/components/Footer";
 import Lots from "@/components/Lots";
 import { lotsPublics } from "@/lib/catalogue";
@@ -14,19 +13,14 @@ export const metadata: Metadata = metaPage({
 });
 
 export default async function Prix() {
-  const lots = await lotsPublics();
+  // Du lot qui vaut le plus au plus modeste
+  const lots = [...(await lotsPublics())].sort((a, b) => (b.valeur || 0) - (a.valeur || 0));
   return (
     <>
-      <EnTete
-        surtitre="Encan silencieux"
-        titre="Les prix"
-        texte="Des lots offerts par des entreprises généreuses. Chaque mise remportée devient un soutien concret pour une famille."
-        image="/images/soiree/verre.jpg"
-        alt="Un verre servi à la lueur des bougies"
-      />
-
       <section className="section">
         <div className="wrap">
+          {/* Titre de la page, lu par Google et les lecteurs d’écran */}
+          <h1 className="sr-only">Les prix de l’encan silencieux</h1>
           {!CONFIG.encan.ouvert && (
             <div className="notice" style={{ marginBottom: "2.5rem" }}>
               <strong>L’encan n’est pas encore ouvert.</strong> {CONFIG.encan.messageFerme}
