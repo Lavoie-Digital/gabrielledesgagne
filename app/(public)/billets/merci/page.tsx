@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import { confirmerPaiement, lireCommande, type Commande } from "@/lib/billetterie";
 import { CONFIG, argent } from "@/lib/donnees";
 import { envoyerBillets } from "@/lib/envoi-billets";
+import { dateSoiree } from "@/lib/recu-fiscal";
 import { stripe, stripeConfigure } from "@/lib/stripe";
 
 export const metadata: Metadata = {
@@ -92,6 +93,7 @@ export default async function Merci({ searchParams }: { searchParams: Promise<{ 
               </div>
               <div className="ticket__per">
                 {n} {n > 1 ? "billets" : "billet"} · {commande.nom}
+                {commande.typeAcheteur === "corporatif" && commande.entreprise ? ` · ${commande.entreprise}` : ""}
               </div>
             </div>
             <div className="ticket__body">
@@ -108,14 +110,25 @@ export default async function Merci({ searchParams }: { searchParams: Promise<{ 
                   <div><dt>Reçu fiscal à venir</dt><dd>{argent(commande.montantRecu)}</dd></div>
                 )}
               </dl>
-              {commande.recu && (
-                <p className="adm-discret" style={{ marginTop: "1rem" }}>
-                  Votre reçu fiscal sera émis par la Fondation En Cœur après la soirée, une fois
-                  les fonds remis, au nom et à l’adresse indiqués lors du paiement.
-                </p>
-              )}
             </div>
           </div>
+
+          {commande.recu && (
+            <p className="don-merci-note">
+              <b>Votre reçu fiscal sera transmis après la soirée.</b> Le reçu de{" "}
+              {argent(commande.montantRecu)} ({argent(CONFIG.billet.montantRecuParBillet)} par billet
+              {commande.donExtra > 0 ? " + votre don" : ""}) est émis par la Fondation En Cœur une
+              fois les fonds remis, après la soirée du {dateSoiree()}
+              {commande.typeAcheteur === "corporatif" && commande.entreprise ? `, au nom de ${commande.entreprise}` : ""}.
+              Vous n’avez rien d’autre à faire d’ici là.
+            </p>
+          )}
+          {commande.courrielEnvoyeLe && (
+            <p className="don-merci-note">
+              <b>Vous ne trouvez pas le courriel avec vos billets ?</b> Vérifiez votre dossier de
+              courriers indésirables (pourriels) et indiquez qu’il ne s’agit pas d’un pourriel.
+            </p>
+          )}
 
           <div className="btn-row" style={{ marginTop: "1.6rem" }}>
             <BoutonImprimer />

@@ -1345,6 +1345,13 @@ a.sponsor-card:hover{ transform:translateY(-3px); box-shadow:var(--soft-2); }
 .don-extra__choix button[aria-pressed="true"]{ background:var(--deep); border-color:var(--deep); color:#fff; }
 .don-extra__autre{ display:flex; align-items:center; gap:.4rem; border:1px solid var(--line); border-radius:100px; padding:0 .9em; background:#fff; }
 .don-extra__autre input{ width:5.5em; border:0; outline:0; font:inherit; font-size:.88rem; padding:.55em 0; background:none; }
+.don-champs{ display:grid; gap:.8rem; margin:0 0 1.2rem; }
+.don-champs label{ display:grid; gap:.35rem; }
+.don-champs span{ font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; font-weight:700; color:var(--ink-soft); }
+.don-champs input{ border:1px solid var(--line); border-radius:10px; padding:.7em .9em; font:inherit; font-size:.95rem; color:var(--ink); background:#fff; }
+.don-champs input:focus{ outline:2px solid var(--sage); outline-offset:1px; border-color:var(--sage); }
+.don-merci-note{ margin-top:1.2rem; text-align:left; background:#F5EFE5; border-radius:12px; padding:1rem 1.2rem; font-size:.95rem; color:var(--ink); }
+.don-merci-note + .don-merci-note{ margin-top:.7rem; }
 .billetterie-erreur{ background:#FBEDEA; border:1px solid #EBC3BA; color:#7A3226; border-radius:10px; padding:.8rem 1rem; font-size:.9rem; margin:0 0 1rem; }
 .places-restantes{ text-align:center; font-size:.82rem; color:var(--clay-deep); font-weight:700; margin:0 0 1rem; }
 

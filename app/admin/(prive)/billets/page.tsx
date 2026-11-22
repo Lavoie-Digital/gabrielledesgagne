@@ -41,15 +41,15 @@ export default async function Billets() {
   const donsPayes = donsEnLigne.filter((d) => d.statut === "payee");
   const totalDonsEnLigne = donsPayes.reduce((s, d) => s + d.montant, 0);
 
-  // Tous les reçus à faire émettre : billets (90 $ par billet + don) et dons en ligne
+  // Tous les reçus à faire émettre : billets (montant par billet + don) et dons en ligne
   const recus = [
     ...payees.filter((c) => c.recu).map((c) => ({
-      id: c.id, provenance: "Billets", nom: c.nom, courriel: c.courriel, adresse: c.adresse,
+      id: c.id, provenance: "Billets", nom: c.entreprise ? `${c.nom} (${c.entreprise})` : c.nom, courriel: c.courriel, adresse: c.adresse,
       detail: `${c.qte} billet${c.qte > 1 ? "s" : ""}${c.donExtra ? ` + don ${argent(c.donExtra)}` : ""}`,
       montant: c.montantRecu, le: c.payeeLe ?? 0,
     })),
     ...donsPayes.filter((d) => d.recu).map((d) => ({
-      id: d.id, provenance: "Don", nom: d.nom, courriel: d.courriel, adresse: d.adresse,
+      id: d.id, provenance: "Don", nom: d.entreprise ? `${d.nom} (${d.entreprise})` : d.nom, courriel: d.courriel, adresse: d.adresse,
       detail: "Don en ligne", montant: d.montant, le: d.payeeLe ?? 0,
     })),
   ].sort((a, b) => a.le - b.le);
@@ -166,8 +166,14 @@ export default async function Billets() {
             <tbody>
               {donsPayes.map((d) => (
                 <tr key={d.id}>
-                  <td>{d.nom}<small>{date(d.payeeLe)}</small></td>
-                  <td>{d.courriel}</td>
+                  <td>
+                    {d.nom}
+                    {d.typeDonateur === "corporatif" && (
+                      <small>{[d.poste, d.entreprise].filter(Boolean).join(", ")}</small>
+                    )}
+                    <small>{date(d.payeeLe)}</small>
+                  </td>
+                  <td>{d.courriel}{d.telephone && <small>{d.telephone}</small>}</td>
                   <td>{d.recu ? "Oui" : "Non"}</td>
                   <td className="nb">{argent(d.montant)}</td>
                   <td>
@@ -235,7 +241,13 @@ export default async function Billets() {
               {payees.map((c) => (
                 <tr key={c.id}>
                   <td><b>{c.numeros.join(", ")}</b><small>{date(c.payeeLe)}</small></td>
-                  <td>{c.nom}<small>{c.courriel}{c.telephone ? ` · ${c.telephone}` : ""}</small></td>
+                  <td>
+                    {c.nom}
+                    {c.typeAcheteur === "corporatif" && (
+                      <small>{[c.poste, c.entreprise].filter(Boolean).join(", ")}</small>
+                    )}
+                    <small>{c.courriel}{c.telephone ? ` · ${c.telephone}` : ""}</small>
+                  </td>
                   <td>{c.allergies || "—"}</td>
                   <td className="nb">{c.qte}</td>
                   <td className="nb">{argent(c.total)}</td>

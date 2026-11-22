@@ -40,34 +40,42 @@ export async function GET(request: Request) {
     const recus = [
       ...payees.filter((c) => c.recu).map((c) => ({
         prenom: c.prenom || c.nom, nom: c.nomFamille, courriel: c.courriel, a: c.adresse ?? VIDE,
-        provenance: "Billets", billets: c.qte, don: c.donExtra, montant: c.montantRecu, le: c.payeeLe,
+        entreprise: c.entreprise, poste: c.poste,
+        provenance: c.typeAcheteur === "corporatif" ? "Billets (corporatif)" : "Billets", billets: c.qte, don: c.donExtra, montant: c.montantRecu, le: c.payeeLe,
         reference: c.numeros.join(" "),
       })),
       ...donsPayes.filter((d) => d.recu).map((d) => ({
         prenom: d.prenom || d.nom, nom: d.nomFamille, courriel: d.courriel, a: d.adresse ?? VIDE,
-        provenance: "Don en ligne", billets: 0, don: d.montant, montant: d.montant, le: d.payeeLe,
+        entreprise: d.entreprise, poste: d.poste,
+        provenance: d.typeDonateur === "corporatif" ? "Don en ligne (corporatif)" : "Don en ligne", billets: 0, don: d.montant, montant: d.montant, le: d.payeeLe,
         reference: d.paiementId,
       })),
     ].sort((x, y) => (x.le ?? 0) - (y.le ?? 0));
 
     lignes = [
-      ligne(["Prénom", "Nom", "Courriel", "Adresse", "Adresse (suite)", "Ville", "Province", "Code postal", "Pays", "Provenance", "Billets", "Don", "Montant du reçu", "Date du paiement", "Référence"]),
+      ligne(["Prénom", "Nom", "Entreprise", "Poste", "Courriel", "Adresse", "Adresse (suite)", "Ville", "Province", "Code postal", "Pays", "Provenance", "Billets", "Don", "Montant du reçu", "Date du paiement", "Référence"]),
       ...recus.map((r) =>
-        ligne([r.prenom, r.nom, r.courriel, r.a.ligne1, r.a.ligne2, r.a.ville, r.a.province, r.a.codePostal, r.a.pays, r.provenance, r.billets, r.don, r.montant, date(r.le), r.reference]),
+        ligne([r.prenom, r.nom, r.entreprise, r.poste, r.courriel, r.a.ligne1, r.a.ligne2, r.a.ville, r.a.province, r.a.codePostal, r.a.pays, r.provenance, r.billets, r.don, r.montant, date(r.le), r.reference]),
       ),
     ];
   } else if (quoi === "dons") {
     lignes = [
-      ligne(["Prénom", "Nom", "Courriel", "Don", "Reçu demandé", "Date du paiement", "Paiement Stripe"]),
-      ...donsPayes.map((d) =>
-        ligne([d.prenom || d.nom, d.nomFamille, d.courriel, d.montant, d.recu ? "Oui" : "Non", date(d.payeeLe), d.paiementId]),
-      ),
+      ligne(["Type", "Prénom", "Nom", "Entreprise", "Poste", "Courriel", "Téléphone", "Adresse", "Adresse (suite)", "Ville", "Province", "Code postal", "Pays", "Don", "Reçu demandé", "Date du paiement", "Paiement Stripe"]),
+      ...donsPayes.map((d) => {
+        const a = d.adresse ?? VIDE;
+        return ligne([
+          d.typeDonateur === "corporatif" ? "Corporatif" : "Personnel",
+          d.prenom || d.nom, d.nomFamille, d.entreprise, d.poste, d.courriel, d.telephone,
+          a.ligne1, a.ligne2, a.ville, a.province, a.codePostal, a.pays,
+          d.montant, d.recu ? "Oui" : "Non", date(d.payeeLe), d.paiementId,
+        ]);
+      }),
     ];
   } else {
     lignes = [
-      ligne(["Numéros de billets", "Prénom", "Nom", "Courriel", "Téléphone", "Billets", "Don supplémentaire", "Total payé", "Reçu demandé", "Montant du reçu", "Allergies", "Date du paiement", "Paiement Stripe"]),
+      ligne(["Numéros de billets", "Type", "Prénom", "Nom", "Entreprise", "Poste", "Courriel", "Téléphone", "Adresse", "Adresse (suite)", "Ville", "Province", "Code postal", "Pays", "Billets", "Don supplémentaire", "Total payé", "Reçu demandé", "Montant du reçu", "Allergies", "Date du paiement", "Paiement Stripe"]),
       ...payees.map((c) =>
-        ligne([c.numeros.join(" "), c.prenom || c.nom, c.nomFamille, c.courriel, c.telephone, c.qte, c.donExtra, c.total, c.recu ? "Oui" : "Non", c.montantRecu, c.allergies, date(c.payeeLe), c.paiementId]),
+        ligne([c.numeros.join(" "), c.typeAcheteur === "corporatif" ? "Corporatif" : "Personnel", c.prenom || c.nom, c.nomFamille, c.entreprise, c.poste, c.courriel, c.telephone, (c.adresse ?? VIDE).ligne1, (c.adresse ?? VIDE).ligne2, (c.adresse ?? VIDE).ville, (c.adresse ?? VIDE).province, (c.adresse ?? VIDE).codePostal, (c.adresse ?? VIDE).pays, c.qte, c.donExtra, c.total, c.recu ? "Oui" : "Non", c.montantRecu, c.allergies, date(c.payeeLe), c.paiementId]),
       ),
     ];
   }

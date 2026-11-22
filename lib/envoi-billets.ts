@@ -3,6 +3,7 @@ import "server-only";
 import { noterEnvoi, reserverEnvoi, type Commande } from "@/lib/billetterie";
 import { courrielConfigure, envoyerCourriel } from "@/lib/courriel";
 import { CONFIG, argent } from "@/lib/donnees";
+import { blocRecu } from "@/lib/recu-fiscal";
 
 /**
  * Le courriel « Vos billets » envoyé dès que le paiement est confirmé.
@@ -42,9 +43,17 @@ function courrielBillets(c: Commande) {
   const n = c.qte;
   const prenom = c.prenom || (c.nom.trim().split(/\s+/)[0] ?? "");
   const sujet = `Vos ${n > 1 ? `${n} billets` : "billet"} pour la soirée Pour Clément (${c.numeros.join(", ")})`;
+  const corporatif = c.typeAcheteur === "corporatif" && c.entreprise;
   const recu = c.recu
-    ? `Votre reçu fiscal de ${argent(c.montantRecu)} (${argent(billet.montantRecuParBillet)} par billet${c.donExtra > 0 ? " + votre don" : ""}) sera émis par la Fondation En Cœur après la soirée, une fois les fonds remis, au nom et à l’adresse indiqués lors du paiement.`
-    : "";
+    ? blocRecu({
+        montant: argent(c.montantRecu),
+        precision: `${argent(billet.montantRecuParBillet)} par billet${c.donExtra > 0 ? " + votre don" : ""}`,
+        nom: c.nom,
+        entreprise: corporatif ? c.entreprise : "",
+        poste: c.poste,
+        adresse: c.adresse,
+      })
+    : null;
 
   const details: [string, string][] = [
     ["Date", evenement.date],
@@ -66,9 +75,9 @@ function courrielBillets(c: Commande) {
     ...details.map(([k, v]) => `${k} : ${v}`),
     "",
     "À l’accueil, il suffit de donner votre nom ou un numéro de billet.",
-    ...(recu ? ["", recu] : []),
+    ...(recu ? ["", ...recu.texte] : []),
     "",
-    `Une question ? Répondez simplement à ce courriel, ou écrivez à ${contact.courriel}.`,
+    `Une question ? Répondez simplement à ce courriel : votre message me parviendra directement. Vous pouvez aussi m’écrire à ${contact.courriel}.`,
     "",
     "Merci d’être là pour Clément, et pour toutes ces familles.",
     `${contact.nom}, maman de Clément`,
@@ -92,7 +101,7 @@ function courrielBillets(c: Commande) {
         <tr><td style="background:#3E4C45;color:#ffffff;text-align:center;padding:32px 24px;">
           <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#A3B5A8;font-weight:700;">Soirée-bénéfice Pour Clément</div>
           <div style="font-size:34px;line-height:1.25;margin:14px 0 10px;">${c.numeros.map(echapper).join(" &nbsp; ")}</div>
-          <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#A3B5A8;font-weight:700;">${n} ${n > 1 ? "billets" : "billet"} · ${echapper(c.nom)}</div>
+          <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#A3B5A8;font-weight:700;">${n} ${n > 1 ? "billets" : "billet"} · ${echapper(c.nom)}${corporatif ? ` · ${echapper(c.entreprise)}` : ""}</div>
         </td></tr>
         <tr><td style="padding:28px 28px 8px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6;">
           <p style="margin:0 0 14px;">Bonjour${prenom ? ` ${echapper(prenom)}` : ""},</p>
@@ -102,8 +111,8 @@ function courrielBillets(c: Commande) {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${lignes}</table>
         </td></tr>
         <tr><td style="padding:20px 28px 28px;font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#4A4B45;">
-          ${recu ? `<p style="margin:0 0 14px;background:#F5EFE5;border-radius:10px;padding:12px 14px;">${echapper(recu)}</p>` : ""}
-          <p style="margin:0 0 14px;">Une question ? Répondez simplement à ce courriel, ou écrivez à <a href="mailto:${echapper(contact.courriel)}" style="color:#9E6547;">${echapper(contact.courriel)}</a>.</p>
+          ${recu ? recu.html : ""}
+          <p style="margin:0 0 14px;">Une question ? Répondez simplement à ce courriel : votre message me parviendra directement. Vous pouvez aussi m’écrire à <a href="mailto:${echapper(contact.courriel)}" style="color:#9E6547;">${echapper(contact.courriel)}</a>.</p>
           <p style="margin:0;font-family:Georgia,serif;font-style:italic;">Merci d’être là pour Clément, et pour toutes ces familles.<br>${echapper(contact.nom)}, maman de Clément</p>
         </td></tr>
       </table>

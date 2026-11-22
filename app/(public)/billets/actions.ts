@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { attacherSession, DUREE_RESERVATION_MS, liberer, reserver } from "@/lib/billetterie";
 import { CONFIG } from "@/lib/donnees";
 import { firebaseConfigure } from "@/lib/firebase-admin";
+import { lireDonateur, MESSAGE_CORPORATIF_INCOMPLET } from "@/lib/recu-fiscal";
 import { stripe, stripeConfigure } from "@/lib/stripe";
 
 export type EtatPaiement = { message: string } | null;
@@ -42,11 +43,13 @@ export async function passerAuPaiement(_: EtatPaiement, form: FormData): Promise
   }
 
   const recu = form.get("recu") === "on";
+  const acheteur = lireDonateur(form);
+  if (!acheteur) return { message: MESSAGE_CORPORATIF_INCOMPLET };
 
   /* 1. Mettre les places de côté */
   let reservation;
   try {
-    reservation = await reserver(qte, donExtra, recu);
+    reservation = await reserver(qte, donExtra, recu, acheteur);
   } catch (e) {
     console.error("[billetterie] réservation impossible", e);
     return { message: "Un problème technique empêche la réservation. Réessayez dans un instant." };
@@ -74,8 +77,8 @@ export async function passerAuPaiement(_: EtatPaiement, form: FormData): Promise
       client_reference_id: reservation.id,
       expires_at: Math.floor((Date.now() + DUREE_RESERVATION_MS) / 1000),
       submit_type: "pay",
-      // L’adresse est nécessaire au reçu fiscal de la Fondation
-      billing_address_collection: recu ? "required" : "auto",
+      // Les mêmes coordonnées que pour un don : adresse et téléphone
+      billing_address_collection: "required",
       phone_number_collection: { enabled: true },
       line_items: [
         {
@@ -130,11 +133,19 @@ export async function passerAuPaiement(_: EtatPaiement, form: FormData): Promise
       custom_text: recu
         ? {
             submit: {
-              message: `Votre reçu fiscal (${billet.montantRecuParBillet} $ par billet${donExtra > 0 ? " + votre don" : ""}) sera émis par la Fondation En Cœur après la soirée, au nom et à l’adresse indiqués ici.`,
+              message: `Votre reçu fiscal (${billet.montantRecuParBillet} $ par billet${donExtra > 0 ? " + votre don" : ""}) sera émis par la Fondation En Cœur après la soirée, au nom et à l’adresse indiqués ici${acheteur.entreprise ? ` (${acheteur.entreprise})` : ""}.`,
             },
           }
         : undefined,
-      metadata: { commande: reservation.id, qte: String(qte), donExtra: String(donExtra), recu: recu ? "oui" : "non" },
+      metadata: {
+        commande: reservation.id,
+        qte: String(qte),
+        donExtra: String(donExtra),
+        recu: recu ? "oui" : "non",
+        acheteur: acheteur.type,
+        entreprise: acheteur.entreprise,
+        poste: acheteur.poste,
+      },
       payment_intent_data: {
         description: `Pour Clément : ${qte} billet${qte > 1 ? "s" : ""}${donExtra > 0 ? ` + don de ${donExtra} $` : ""}`,
         metadata: { commande: reservation.id },

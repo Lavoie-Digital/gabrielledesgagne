@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { CONFIG, argent } from "@/lib/donnees";
 import { confirmerDon, lireDon, type Don } from "@/lib/dons";
 import { envoyerRemerciementDon } from "@/lib/envoi-dons";
+import { dateSoiree } from "@/lib/recu-fiscal";
 import { stripe, stripeConfigure } from "@/lib/stripe";
 
 export const metadata: Metadata = {
@@ -47,9 +48,18 @@ export default async function MerciDon({ searchParams }: { searchParams: Promise
                 {don.courrielEnvoyeLe ? ` Une confirmation vous a été envoyée à ${don.courriel}.` : ""}
               </p>
               {don.recu && (
-                <p style={{ marginTop: "1rem", color: "var(--ink-soft)" }}>
-                  Votre reçu fiscal de {argent(don.montant)} sera émis par la Fondation En Cœur
-                  après la soirée, une fois les fonds remis.
+                <p className="don-merci-note">
+                  <b>Votre reçu fiscal sera transmis après la soirée.</b> Le reçu de{" "}
+                  {argent(don.montant)} est émis par la Fondation En Cœur une fois les fonds remis,
+                  après la soirée du {dateSoiree()}
+                  {don.typeDonateur === "corporatif" && don.entreprise ? `, au nom de ${don.entreprise}` : ""}.
+                  Vous n’avez rien d’autre à faire d’ici là.
+                </p>
+              )}
+              {don.courrielEnvoyeLe && (
+                <p className="don-merci-note">
+                  <b>Vous ne trouvez pas le courriel de confirmation ?</b> Vérifiez votre dossier de
+                  courriers indésirables (pourriels) et indiquez qu’il ne s’agit pas d’un pourriel.
                 </p>
               )}
               <p className="pull" style={{ border: 0, padding: 0, fontSize: "1.4rem", marginTop: "2rem" }}>

@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import type Stripe from "stripe";
 import { CONFIG } from "@/lib/donnees";
 import { db } from "@/lib/firebase-admin";
+import type { Donateur, TypeDonateur } from "@/lib/recu-fiscal";
 
 /**
  * La billetterie en ligne : les commandes, enregistrées dans Firestore.
@@ -39,7 +40,10 @@ export type Commande = {
   qte: number;
   donExtra: number; // en dollars
   recu: boolean; // la personne veut un reçu fiscal
-  montantRecu: number; // 90 $ par billet + don supplémentaire, si reçu demandé
+  montantRecu: number; // montantRecuParBillet × billets + don supplémentaire, si reçu demandé
+  typeAcheteur: TypeDonateur;
+  entreprise: string; // achats corporatifs seulement
+  poste: string;
   total: number; // en dollars
   creeLe: number; // millisecondes
   expireA: number;
@@ -101,6 +105,9 @@ function versCommande(id: string, d: FirebaseFirestore.DocumentData): Commande {
     donExtra: nombre(d.donExtra),
     recu: d.recu === true,
     montantRecu: nombre(d.montantRecu),
+    typeAcheteur: d.typeAcheteur === "corporatif" ? "corporatif" : "personnel",
+    entreprise: texte(d.entreprise),
+    poste: texte(d.poste),
     total: nombre(d.total),
     creeLe: nombre(d.creeLe),
     expireA: nombre(d.expireA),
@@ -179,7 +186,7 @@ export async function changerOuverture(ouverte: boolean, par: string) {
   await db().doc(PARAMETRES).set({ ouverte, ouvertureModifieeLe: Date.now(), ouvertureModifieePar: par }, { merge: true });
 }
 
-export async function reserver(qte: number, donExtra: number, recu: boolean): Promise<Reservation> {
+export async function reserver(qte: number, donExtra: number, recu: boolean, acheteur: Donateur): Promise<Reservation> {
   const base = db();
   const parametres = base.doc(PARAMETRES);
   const ouvertes = base.collection(COMMANDES).where("statut", "in", ["payee", "en_traitement", "en_attente"]);
@@ -206,6 +213,9 @@ export async function reserver(qte: number, donExtra: number, recu: boolean): Pr
       donExtra,
       recu,
       montantRecu: montantRecu(qte, donExtra, recu),
+      typeAcheteur: acheteur.type,
+      entreprise: acheteur.entreprise,
+      poste: acheteur.poste,
       total: qte * CONFIG.billet.prix + donExtra,
       creeLe: maintenant,
       expireA,

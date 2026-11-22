@@ -3,6 +3,7 @@ import "server-only";
 import { courrielConfigure, envoyerCourriel } from "@/lib/courriel";
 import { CONFIG, argent } from "@/lib/donnees";
 import { noterEnvoiDon, reserverEnvoiDon, type Don } from "@/lib/dons";
+import { blocRecu } from "@/lib/recu-fiscal";
 
 /**
  * Le courriel de remerciement envoyé après un don en ligne.
@@ -33,19 +34,20 @@ function courrielDon(d: Don) {
   const { contact } = CONFIG;
   const prenom = d.prenom || (d.nom.trim().split(/\s+/)[0] ?? "");
   const sujet = `Merci pour votre don de ${argent(d.montant)} en mémoire de Clément`;
+  const corporatif = d.typeDonateur === "corporatif" && d.entreprise;
   const recu = d.recu
-    ? `Votre reçu fiscal de ${argent(d.montant)} sera émis par la Fondation En Cœur après la soirée du 12 novembre, une fois les fonds remis, au nom et à l’adresse indiqués lors du paiement.`
-    : "";
+    ? blocRecu({ montant: argent(d.montant), nom: d.nom, entreprise: corporatif ? d.entreprise : "", poste: d.poste, adresse: d.adresse })
+    : null;
 
   const texte = [
     `Bonjour${prenom ? ` ${prenom}` : ""},`,
     "",
-    `Merci du fond du cœur pour votre don de ${argent(d.montant)} à la Fondation En Cœur, en mémoire de Clément.`,
+    `Merci du fond du cœur pour votre don de ${argent(d.montant)} à la Fondation En Cœur, en mémoire de Clément${corporatif ? `, au nom de ${d.entreprise}` : ""}.`,
     "",
     "Votre geste aide des familles qui, en ce moment même, veillent au chevet d’un enfant au cœur fragile : un peu de répit, un peu de chaleur, et la certitude qu’elles ne portent pas cela seules.",
-    ...(recu ? ["", recu] : []),
+    ...(recu ? ["", ...recu.texte] : []),
     "",
-    `Une question ? Répondez simplement à ce courriel, ou écrivez à ${contact.courriel}.`,
+    `Une question ? Répondez simplement à ce courriel : votre message me parviendra directement. Vous pouvez aussi m’écrire à ${contact.courriel}.`,
     "",
     `${contact.nom}, maman de Clément`,
   ].join("\n");
@@ -63,10 +65,10 @@ function courrielDon(d: Don) {
         </td></tr>
         <tr><td style="padding:28px;font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#4A4B45;">
           <p style="margin:0 0 14px;">Bonjour${prenom ? ` ${echapper(prenom)}` : ""},</p>
-          <p style="margin:0 0 14px;">Merci du fond du cœur pour votre don, en mémoire de Clément.</p>
+          <p style="margin:0 0 14px;">Merci du fond du cœur pour votre don, en mémoire de Clément${corporatif ? `, au nom de ${echapper(d.entreprise)}` : ""}.</p>
           <p style="margin:0 0 14px;">Votre geste aide des familles qui, en ce moment même, veillent au chevet d’un enfant au cœur fragile : un peu de répit, un peu de chaleur, et la certitude qu’elles ne portent pas cela seules.</p>
-          ${recu ? `<p style="margin:0 0 14px;background:#F5EFE5;border-radius:10px;padding:12px 14px;">${echapper(recu)}</p>` : ""}
-          <p style="margin:0 0 14px;">Une question ? Répondez simplement à ce courriel, ou écrivez à <a href="mailto:${echapper(contact.courriel)}" style="color:#9E6547;">${echapper(contact.courriel)}</a>.</p>
+          ${recu ? recu.html : ""}
+          <p style="margin:0 0 14px;">Une question ? Répondez simplement à ce courriel : votre message me parviendra directement. Vous pouvez aussi m’écrire à <a href="mailto:${echapper(contact.courriel)}" style="color:#9E6547;">${echapper(contact.courriel)}</a>.</p>
           <p style="margin:0;font-family:Georgia,serif;font-style:italic;color:#2E3A34;">${echapper(contact.nom)}, maman de Clément</p>
         </td></tr>
       </table>

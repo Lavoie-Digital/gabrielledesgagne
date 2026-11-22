@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { CONFIG, argent } from "@/lib/donnees";
 import { attacherSessionDon, creerDon, expirerDon } from "@/lib/dons";
 import { firebaseConfigure } from "@/lib/firebase-admin";
+import { lireDonateur, MESSAGE_CORPORATIF_INCOMPLET } from "@/lib/recu-fiscal";
 import { stripe, stripeConfigure } from "@/lib/stripe";
 
 export type EtatDon = { message: string } | null;
@@ -36,10 +37,13 @@ export async function faireUnDon(_: EtatDon, form: FormData): Promise<EtatDon> {
     return { message: `Pour un don de plus de ${argent(maximum)}, écrivez-nous : nous vous accompagnerons.` };
   }
   const recu = form.get("recu") === "on";
+  const donateur = lireDonateur(form);
+  if (!donateur) return { message: MESSAGE_CORPORATIF_INCOMPLET };
+  const { type, entreprise, poste } = donateur;
 
   let id: string;
   try {
-    id = await creerDon(montant, recu);
+    id = await creerDon(montant, recu, donateur);
   } catch (e) {
     console.error("[don] enregistrement impossible", e);
     return { message: "Un problème technique empêche le don. Réessayez dans un instant." };
@@ -54,8 +58,9 @@ export async function faireUnDon(_: EtatDon, form: FormData): Promise<EtatDon> {
       currency: "cad",
       client_reference_id: id,
       submit_type: "donate",
-      // L’adresse n’est demandée que pour le reçu fiscal
-      billing_address_collection: recu ? "required" : "auto",
+      // Les mêmes coordonnées que la Fondation En Cœur : adresse et téléphone
+      billing_address_collection: "required",
+      phone_number_collection: { enabled: true },
       line_items: [
         {
           quantity: 1,
@@ -63,8 +68,8 @@ export async function faireUnDon(_: EtatDon, form: FormData): Promise<EtatDon> {
             currency: "cad",
             unit_amount: montant * 100,
             product_data: {
-              name: "Don à la Fondation En Cœur",
-              description: "En mémoire de Clément",
+              name: type === "corporatif" ? `Don corporatif : ${entreprise}` : "Don à la Fondation En Cœur",
+              description: "Don à la Fondation En Cœur, en mémoire de Clément",
             },
           },
         },
@@ -92,7 +97,7 @@ export async function faireUnDon(_: EtatDon, form: FormData): Promise<EtatDon> {
             },
           }
         : undefined,
-      metadata: { type: "don", don: id, recu: recu ? "oui" : "non" },
+      metadata: { type: "don", don: id, recu: recu ? "oui" : "non", donateur: type, entreprise, poste },
       payment_intent_data: {
         description: `Pour Clément : don de ${montant} $`,
         metadata: { type: "don", don: id },

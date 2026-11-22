@@ -153,10 +153,11 @@ plus bas.
 ## Les dons : Stripe
 
 La page **Faire un don** (`/don`) sert **uniquement aux dons** : la personne choisit
-un montant (20, 50, 100, 250 $ ou un autre), peut cocher **« Je souhaite un reçu
-fiscal »**, puis paie sur la page Stripe. Stripe lui demande seulement son prénom,
-son nom, son courriel et, si elle veut un reçu, son adresse. Pas de billet, pas
-d’allergies.
+**Personnel** ou **Corporatif** (en corporatif, elle indique aussi le nom de
+l’entreprise et son poste), un montant (20, 50, 100, 250 $ ou un autre), peut cocher
+**« Je souhaite un reçu fiscal »**, puis paie sur la page Stripe. Stripe lui demande
+son prénom, son nom, son courriel, son téléphone et son adresse (les mêmes
+coordonnées que la Fondation En Cœur). Pas de billet, pas d’allergies.
 
 Elle revient sur une page de remerciement et reçoit un courriel de remerciement
 (SendGrid). Le reçu fiscal porte sur le **montant complet du don** et est émis par
@@ -175,10 +176,11 @@ Les billets se paient directement sur le site, par **Stripe**.
 
 **Le parcours :**
 
-1. Sur `/billets`, la personne choisit le nombre de billets, peut **ajouter un don**
-   à la Fondation, et peut cocher **« Je souhaite un reçu fiscal »**.
-2. Elle paie sur la page sécurisée de Stripe. Si elle a demandé un reçu, Stripe
-   lui demande son adresse. Elle peut aussi y indiquer une allergie.
+1. Sur `/billets`, la personne choisit **Personnel** ou **Corporatif** (entreprise
+   et poste, comme pour un don), le nombre de billets, peut **ajouter un don** à la
+   Fondation, et peut cocher **« Je souhaite un reçu fiscal »**.
+2. Elle paie sur la page sécurisée de Stripe, qui lui demande son nom, son courriel,
+   son téléphone et son adresse. Elle peut aussi y indiquer une allergie.
 3. Dès que le paiement passe, Stripe prévient le site (le **webhook**), qui
    attribue les **numéros de billets** : L101, L102, L103… La personne revient sur
    une page qui affiche ses numéros, à imprimer ou à garder sur son téléphone, et
@@ -190,7 +192,7 @@ côté 30 minutes. S’il abandonne, elles se libèrent toutes seules. Une fois 
 billets vendus, la billetterie affiche « complet ». Le nombre se change dans
 `lib/donnees.ts`, section `billet` (`limite`).
 
-**Le reçu fiscal :** 90 $ par billet, plus le don supplémentaire. Il n’est
+**Le reçu fiscal :** 60 $ par billet (`montantRecuParBillet` dans `lib/donnees.ts`), plus le don supplémentaire. Il n’est
 **pas** émis par le site : la Fondation En Cœur l’émet **après la soirée**, une fois
 les fonds remis. Dans l’espace privé, la page **« Billets et reçus »** donne la liste
 à lui transmettre (nom, adresse, montant), avec un bouton **Exporter les reçus

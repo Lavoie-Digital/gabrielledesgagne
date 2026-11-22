@@ -2,11 +2,13 @@
 
 import { useActionState, useState } from "react";
 import { passerAuPaiement } from "@/app/(public)/billets/actions";
+import ChoixDonateur, { type TypeDonateur } from "@/components/ChoixDonateur";
 import { CONFIG, argent } from "@/lib/donnees";
 
 /**
- * Le formulaire de réservation : nombre de billets, reçu fiscal, don
- * supplémentaire, puis envoi vers la page de paiement sécurisée de Stripe.
+ * Le formulaire de réservation : achat personnel ou corporatif, nombre de
+ * billets, don supplémentaire, reçu fiscal, puis envoi vers la page de
+ * paiement sécurisée de Stripe (nom, courriel, téléphone et adresse).
  *
  * `restantes` vaut null quand on ne sait pas (Firestore injoignable) ;
  * `ouverte` est faux tant que Stripe n’est pas configuré.
@@ -18,6 +20,7 @@ export default function Billetterie({ restantes, ouverte }: { restantes: number 
 
   const [qte, setQte] = useState(1);
   const [recu, setRecu] = useState(false);
+  const [type, setType] = useState<TypeDonateur>("personnel");
   const [don, setDon] = useState(0);
   const [autre, setAutre] = useState("");
   const [etat, action, envoi] = useActionState(passerAuPaiement, null);
@@ -49,6 +52,8 @@ export default function Billetterie({ restantes, ouverte }: { restantes: number 
           Plus que {restantes} {restantes > 1 ? "places" : "place"} disponibles
         </p>
       )}
+
+      <ChoixDonateur type={type} onChange={setType} titre="Type d’achat" />
 
       <div className="qty">
         <label htmlFor="qte">Nombre de billets</label>
@@ -112,8 +117,8 @@ export default function Billetterie({ restantes, ouverte }: { restantes: number 
           <small>
             {argent(montantRecuParBillet)} par billet{don > 0 ? " + votre don" : ""}, soit{" "}
             <b>{argent(qte * montantRecuParBillet + don)}</b>. Le reçu est émis par la Fondation
-            En Cœur après la soirée, une fois les fonds remis. Votre adresse vous sera demandée
-            au paiement.
+            En Cœur <b>après la soirée</b>, une fois les fonds remis : vous ne le recevrez donc
+            pas tout de suite.
           </small>
         </span>
       </label>
@@ -149,8 +154,9 @@ export default function Billetterie({ restantes, ouverte }: { restantes: number 
       )}
 
       <p style={{ fontSize: ".82rem", color: "var(--ink-soft)", marginTop: "1rem", textAlign: "center" }}>
-        Paiement sécurisé par Stripe. Vos numéros de billets s’affichent dès le paiement
-        confirmé et vous sont envoyés par courriel. Une question ? Écrivez à{" "}
+        Paiement sécurisé par Stripe. Vos coordonnées (nom, courriel, téléphone et adresse)
+        vous seront demandées à l’étape suivante. Vos numéros de billets s’affichent dès le
+        paiement confirmé et vous sont envoyés par courriel. Une question ? Écrivez à{" "}
         <a href={`mailto:${CONFIG.contact.courriel}`}>{CONFIG.contact.courriel}</a>.
       </p>
     </form>

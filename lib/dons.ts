@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import type Stripe from "stripe";
 import { coordonnees, type Adresse } from "@/lib/billetterie";
 import { db } from "@/lib/firebase-admin";
+import type { Donateur, TypeDonateur } from "@/lib/recu-fiscal";
 
 /**
  * Les dons faits en ligne depuis la page « Faire un don » (paiement Stripe),
@@ -21,6 +22,9 @@ export type Don = {
   statut: StatutDon;
   montant: number; // en dollars
   recu: boolean;
+  typeDonateur: TypeDonateur;
+  entreprise: string; // dons corporatifs seulement
+  poste: string;
   creeLe: number;
   payeeLe: number | null;
   sessionId: string;
@@ -47,6 +51,9 @@ function versDon(id: string, d: FirebaseFirestore.DocumentData): Don {
     statut: (["en_attente", "payee", "expiree"].includes(d.statut) ? d.statut : "expiree") as StatutDon,
     montant: nombre(d.montant),
     recu: d.recu === true,
+    typeDonateur: d.typeDonateur === "corporatif" ? "corporatif" : "personnel",
+    entreprise: texte(d.entreprise),
+    poste: texte(d.poste),
     creeLe: nombre(d.creeLe),
     payeeLe: typeof d.payeeLe === "number" ? d.payeeLe : null,
     sessionId: texte(d.sessionId),
@@ -82,12 +89,19 @@ export async function lireDon(id: string): Promise<Don | null> {
   return d.exists ? versDon(d.id, d.data()!) : null;
 }
 
-export async function creerDon(montant: number, recu: boolean): Promise<string> {
+export async function creerDon(
+  montant: number,
+  recu: boolean,
+  donateur: Donateur,
+): Promise<string> {
   const id = randomUUID();
   await db().collection(DONS).doc(id).set({
     statut: "en_attente",
     montant,
     recu,
+    typeDonateur: donateur.type,
+    entreprise: donateur.entreprise,
+    poste: donateur.poste,
     creeLe: Date.now(),
     payeeLe: null,
   });
