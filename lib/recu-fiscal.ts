@@ -35,7 +35,7 @@ const echapper = (s: string) =>
 
 /* Le bloc « reçu fiscal » du courriel, en texte et en HTML */
 export function blocRecu(p: {
-  montant: string; // déjà formaté, ex. « 150 $ »
+  montant: string; // déjà formaté, ex. « 150 $ » ; vide = montant du reçu à venir
   precision?: string; // ex. « 60 $ par billet + votre don »
   nom: string;
   entreprise: string;
@@ -43,7 +43,7 @@ export function blocRecu(p: {
   adresse: Adresse | null;
 }) {
   const titre = "Votre reçu fiscal sera transmis après la soirée";
-  const texte = `Le reçu fiscal de ${p.montant}${p.precision ? ` (${p.precision})` : ""} est émis par la Fondation En Cœur après la soirée du ${dateSoiree()}, une fois les fonds remis. Vous ne le recevrez donc pas tout de suite : vous n’avez rien d’autre à faire d’ici là.`;
+  const texte = `${p.montant ? `Le reçu fiscal de ${p.montant}${p.precision ? ` (${p.precision})` : ""}` : "Le montant du reçu est à venir. Le reçu fiscal"} est émis par la Fondation En Cœur après la soirée du ${dateSoiree()}, une fois les fonds remis. Vous ne le recevrez donc pas tout de suite : vous n’avez rien d’autre à faire d’ici là.`;
   const verif = "Il sera fait aux coordonnées suivantes. Si une information est inexacte, répondez à ce courriel pour la corriger :";
   const a = p.adresse;
   const coordonnees = [

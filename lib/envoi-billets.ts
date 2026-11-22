@@ -39,15 +39,14 @@ const echapper = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 function courrielBillets(c: Commande) {
-  const { evenement, contact, billet } = CONFIG;
+  const { evenement, contact } = CONFIG;
   const n = c.qte;
   const prenom = c.prenom || (c.nom.trim().split(/\s+/)[0] ?? "");
   const sujet = `Vos ${n > 1 ? `${n} billets` : "billet"} pour la soirée Pour Clément (${c.numeros.join(", ")})`;
   const corporatif = c.typeAcheteur === "corporatif" && c.entreprise;
   const recu = c.recu
     ? blocRecu({
-        montant: argent(c.montantRecu),
-        precision: `${argent(billet.montantRecuParBillet)} par billet${c.donExtra > 0 ? " + votre don" : ""}`,
+        montant: "", // montant du reçu à venir : à confirmer avec la Fondation
         nom: c.nom,
         entreprise: corporatif ? c.entreprise : "",
         poste: c.poste,

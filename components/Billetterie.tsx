@@ -14,7 +14,7 @@ import { CONFIG, argent } from "@/lib/donnees";
  * `ouverte` est faux tant que Stripe n’est pas configuré.
  */
 export default function Billetterie({ restantes, ouverte }: { restantes: number | null; ouverte: boolean }) {
-  const { prix, placesParTable, maxParCommande, montantRecuParBillet, donsSuggeres } = CONFIG.billet;
+  const { prix, placesParTable, maxParCommande, donsSuggeres } = CONFIG.billet;
   const max = Math.max(1, Math.min(maxParCommande, restantes ?? maxParCommande));
   const complet = restantes === 0;
 
@@ -115,8 +115,7 @@ export default function Billetterie({ restantes, ouverte }: { restantes: number 
         <span>
           <b>Je souhaite un reçu fiscal</b>
           <small>
-            {argent(montantRecuParBillet)} par billet{don > 0 ? " + votre don" : ""}, soit{" "}
-            <b>{argent(qte * montantRecuParBillet + don)}</b>. Le reçu est émis par la Fondation
+            Montant du reçu à venir. Le reçu est émis par la Fondation
             En Cœur <b>après la soirée</b>, une fois les fonds remis : vous ne le recevrez donc
             pas tout de suite.
           </small>

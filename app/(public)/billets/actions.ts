@@ -133,7 +133,7 @@ export async function passerAuPaiement(_: EtatPaiement, form: FormData): Promise
       custom_text: recu
         ? {
             submit: {
-              message: `Votre reçu fiscal (${billet.montantRecuParBillet} $ par billet${donExtra > 0 ? " + votre don" : ""}) sera émis par la Fondation En Cœur après la soirée, au nom et à l’adresse indiqués ici${acheteur.entreprise ? ` (${acheteur.entreprise})` : ""}.`,
+              message: `Votre reçu fiscal (montant du reçu à venir) sera émis par la Fondation En Cœur après la soirée, au nom et à l’adresse indiqués ici${acheteur.entreprise ? ` (${acheteur.entreprise})` : ""}.`,
             },
           }
         : undefined,
