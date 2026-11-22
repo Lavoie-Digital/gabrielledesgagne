@@ -7,6 +7,48 @@ import VitrineEncan from "@/components/VitrineEncan";
 import { BandeauDefilant, Credit, CreditDuo } from "@/components/Commanditaires";
 import { commanditairesPublics, lotsPublics } from "@/lib/catalogue";
 import { CONFIG } from "@/lib/donnees";
+import { DESCRIPTION, SITE_URL, TITRE, metaPage } from "@/lib/seo";
+
+export const metadata = metaPage({ titre: TITRE, description: DESCRIPTION, chemin: "/" });
+
+/* Fiche « événement » lue par Google (date, lieu, prix du billet) */
+const DONNEES_STRUCTUREES = {
+  "@context": "https://schema.org",
+  "@type": "Event",
+  name: "Pour Clément : soirée-bénéfice et encan silencieux",
+  description: DESCRIPTION,
+  startDate: `${CONFIG.evenement.dateISO}-05:00`,
+  eventStatus: "https://schema.org/EventScheduled",
+  eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+  inLanguage: "fr-CA",
+  image: [`${SITE_URL}/opengraph-image`, `${SITE_URL}/images/clement-portrait.jpg`],
+  url: SITE_URL,
+  location: {
+    "@type": "Place",
+    name: CONFIG.evenement.lieu,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "3031, boulevard Laurier",
+      addressLocality: "Québec",
+      addressRegion: "QC",
+      postalCode: "G1V 2M2",
+      addressCountry: "CA",
+    },
+  },
+  offers: {
+    "@type": "Offer",
+    price: CONFIG.billet.prix,
+    priceCurrency: "CAD",
+    availability: "https://schema.org/InStock",
+    url: `${SITE_URL}/billets`,
+  },
+  organizer: {
+    "@type": "Person",
+    name: CONFIG.contact.nom,
+    url: SITE_URL,
+  },
+  performer: { "@type": "Organization", name: "Fondation En Cœur", url: "https://en-coeur.org/" },
+};
 
 const MOMENTS = [
   {
@@ -37,6 +79,10 @@ export default async function Accueil() {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(DONNEES_STRUCTUREES).replace(/</g, "\\u003c") }}
+      />
       <Ouverture />
 
       {/* ============ LA PHRASE ============ */}

@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Lato } from "next/font/google";
 import "./globals.css";
+import { DESCRIPTION, IMAGE_PARTAGE, SITE_NOM, SITE_URL, TITRE } from "@/lib/seo";
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -16,12 +17,42 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Pour Clément | Soirée-bénéfice et encan silencieux",
+    default: TITRE,
     template: "%s | Pour Clément",
   },
-  description:
-    "Soirée-bénéfice et encan silencieux à la mémoire de Clément, au profit de la Fondation En Cœur. Le 12 novembre 2027 à l’Hôtel Plaza Québec.",
+  description: DESCRIPTION,
+  // Valeurs par défaut du partage ; chaque page publique précise les siennes
+  openGraph: {
+    type: "website",
+    locale: "fr_CA",
+    siteName: SITE_NOM,
+    title: TITRE,
+    description: DESCRIPTION,
+    images: [IMAGE_PARTAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITRE,
+    description: DESCRIPTION,
+    images: [IMAGE_PARTAGE],
+  },
+  applicationName: SITE_NOM,
+  keywords: [
+    "Pour Clément",
+    "soirée-bénéfice Québec",
+    "encan silencieux",
+    "Fondation En Cœur",
+    "enfants cardiaques",
+    "Hôtel Plaza Québec",
+    "collecte de fonds",
+  ],
+  formatDetection: { telephone: false },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#3E4C45",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

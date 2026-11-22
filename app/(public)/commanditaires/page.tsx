@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { metaPage } from "@/lib/seo";
 import EnTete from "@/components/EnTete";
 import Link from "next/link";
 import Footer from "@/components/Footer";
@@ -10,11 +11,12 @@ import {
 import { commanditairesPublics } from "@/lib/catalogue";
 import { CONFIG } from "@/lib/donnees";
 
-export const metadata: Metadata = {
-  title: "Nos commanditaires",
+export const metadata: Metadata = metaPage({
+  titre: "Nos commanditaires",
   description:
     "Les entreprises qui rendent possible la soirée-bénéfice Pour Clément, et comment devenir commanditaire à votre tour.",
-};
+  chemin: "/commanditaires",
+});
 
 const PALIERS = [
   {

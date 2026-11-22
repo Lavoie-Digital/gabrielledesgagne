@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
+import { metaPage } from "@/lib/seo";
 import EnTete from "@/components/EnTete";
 import Footer from "@/components/Footer";
 import Lots from "@/components/Lots";
 import { lotsPublics } from "@/lib/catalogue";
 import { CONFIG } from "@/lib/donnees";
 
-export const metadata: Metadata = {
-  title: "Les prix de l’encan",
+export const metadata: Metadata = metaPage({
+  titre: "Les prix de l’encan",
   description:
     "Les lots de l’encan silencieux de la soirée-bénéfice Pour Clément, offerts par des entreprises d’ici au profit de la Fondation En Cœur.",
-};
+  chemin: "/prix",
+});
 
 export default async function Prix() {
   const lots = await lotsPublics();

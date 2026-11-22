@@ -6,6 +6,11 @@
 # (voir lib/firebase-admin.ts).
 
 env:
+  # L’adresse publique du site, sans barre oblique à la fin. Sert aux liens
+  # complets exigés par Facebook (image de partage), au sitemap et à Google.
+  - variable: NEXT_PUBLIC_SITE_URL
+    value: https://encoeurpourclement.ca
+
   # Firebase côté navigateur (connexion à l’espace privé) : valeurs publiques,
   # nécessaires dès la compilation
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY

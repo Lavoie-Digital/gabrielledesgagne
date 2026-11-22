@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { metaPage } from "@/lib/seo";
 import EnTete from "@/components/EnTete";
 import Link from "next/link";
 import Footer from "@/components/Footer";
@@ -7,11 +8,12 @@ import { CONFIG } from "@/lib/donnees";
 import { firebaseConfigure } from "@/lib/firebase-admin";
 import { stripeConfigure } from "@/lib/stripe";
 
-export const metadata: Metadata = {
-  title: "Faire un don",
+export const metadata: Metadata = metaPage({
+  titre: "Faire un don",
   description:
     "Faites un don en ligne au profit de la Fondation En Cœur, en mémoire de Clément. Chaque geste soutient une famille d’enfant cardiaque.",
-};
+  chemin: "/don",
+});
 
 const MONTANTS = [
   ["20 $", "Un repas chaud pour un parent à l’hôpital"],

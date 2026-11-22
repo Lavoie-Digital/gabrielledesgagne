@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
+import { metaPage } from "@/lib/seo";
 import EnTete from "@/components/EnTete";
 import Footer from "@/components/Footer";
 import { CONFIG } from "@/lib/donnees";
 
-export const metadata: Metadata = {
-  title: "Politique de confidentialité",
+export const metadata: Metadata = metaPage({
+  titre: "Politique de confidentialité",
   description:
     "Comment la soirée-bénéfice Pour Clément recueille, utilise, conserve et protège vos renseignements personnels, conformément à la Loi 25.",
-};
+  chemin: "/confidentialite",
+});
 
 /* Le sommaire, dans l’ordre des sections */
 const SECTIONS = [

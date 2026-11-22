@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { metaPage } from "@/lib/seo";
 import EnTete from "@/components/EnTete";
 import Link from "next/link";
 import Billetterie from "@/components/Billetterie";
@@ -8,11 +9,12 @@ import { CONFIG, argent } from "@/lib/donnees";
 import { firebaseConfigure } from "@/lib/firebase-admin";
 import { stripeConfigure } from "@/lib/stripe";
 
-export const metadata: Metadata = {
-  title: "Réservez votre billet",
+export const metadata: Metadata = metaPage({
+  titre: "Réservez votre billet",
   description:
     "Réservez votre billet pour la soirée-bénéfice Pour Clément : 150 $ incluant un cocktail d’accueil, un repas 4 services et deux consommations.",
-};
+  chemin: "/billets",
+});
 
 /* Le nombre de places restantes doit toujours être à jour */
 export const dynamic = "force-dynamic";
