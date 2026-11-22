@@ -379,7 +379,6 @@ export default function TableauMises() {
   if (!lots || !lots.length) {
     return (
       <div className="direct">
-        <Ambiance />
         <div className="direct__attente">
           <span className="direct__attente-ourson" aria-hidden="true" />
           {!lots
@@ -412,20 +411,21 @@ export default function TableauMises() {
 
   return (
     <div className={"direct" + (compact ? " direct--compact" : "")}>
-      <Ambiance />
 
       {/* ---------------- En-tête ---------------- */}
       <header className="direct__tete">
         <div className="direct__marque">
           <span className="direct__ourson" aria-hidden="true" />
           <div>
-            <p className="direct__surtitre">Encan silencieux &middot; Pour Clément</p>
-            <h1 className="direct__titre">
-              Les mises <em>en direct</em>
+            <p className="direct__surtitre">
+              Encan silencieux, pour Clément
               <span className={"direct__pastille" + (enDirect ? " est-direct" : "")}>
                 <i />
                 {panne ? "Hors ligne" : enDirect ? (demo ? "Démo" : "En direct") : "Local"}
               </span>
+            </p>
+            <h1 className="direct__titre">
+              Les mises <em>en direct</em>
             </h1>
           </div>
         </div>
@@ -460,17 +460,15 @@ export default function TableauMises() {
         >
           <div className="vedette__image">
             <Visuel lot={lotVedette} className="vedette__visuel" />
-            <span className="vedette__badge">
-              {estNouvelle ? "Nouvelle mise" : rangVedette === 1 ? "En tête de l’encan" : "Lot à l’honneur"}
-            </span>
-            <span className="vedette__rang">
-              <small>Rang</small>
-              {rangVedette}
-            </span>
           </div>
 
           <div className="vedette__texte">
-            {lotVedette.categorie && <p className="vedette__cat">{lotVedette.categorie}</p>}
+            <p className="vedette__cat">
+              <span className="vedette__badge">
+                {estNouvelle ? "Nouvelle mise" : rangVedette === 1 ? "En tête" : `${rangVedette}e place`}
+              </span>
+              {lotVedette.categorie && <span>{lotVedette.categorie}</span>}
+            </p>
             <h2 className="vedette__titre">{lotVedette.titre}</h2>
             {lotVedette.donateur && <p className="vedette__don">Offert par {lotVedette.donateur}</p>}
 
@@ -533,13 +531,13 @@ export default function TableauMises() {
                 }
                 style={{ "--part": l.mise / max } as React.CSSProperties}
               >
-                <span className="rangee__rang">{i + 1}</span>
+                <span className="rangee__rang">{deuxChiffres(i + 1)}</span>
                 {!compact && <Visuel lot={l} className="rangee__visuel" />}
                 <span className="rangee__lot">
                   <span className="rangee__nom">{l.titre}</span>
                   {l.donateur && !compact && <span className="rangee__don">{l.donateur}</span>}
                 </span>
-                {monte && <span className="rangee__monte">▲ {monte}</span>}
+                {monte && <span className="rangee__monte">↑ {monte}</span>}
                 <span className="rangee__montant">
                   <Montant valeur={l.mise} />
                   {l.nbMises > 0 && !compact && (
@@ -593,63 +591,25 @@ export default function TableauMises() {
 }
 
 /* ------------------------------------------------------------------------
-   Le fond : de grandes taches de lumière qui dérivent lentement
-   ------------------------------------------------------------------------ */
-function Ambiance() {
-  return (
-    <div className="direct__ambiance" aria-hidden="true">
-      <span />
-      <span />
-      <span />
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------------
    L’annonce plein écran
    ------------------------------------------------------------------------ */
-const CONFETTIS = Array.from({ length: 34 }, (_, i) => ({
-  x: (i * 37) % 100,
-  delai: ((i * 53) % 100) / 100,
-  duree: 2.4 + ((i * 29) % 10) / 6,
-  taille: 6 + ((i * 17) % 9),
-  rot: (i * 47) % 360,
-  teinte: i % 3,
-}));
-
 function AnnonceGeante({ annonce }: { annonce: Annonce & { sortie?: boolean } }) {
   return (
     <div className={"annonce" + (annonce.sortie ? " annonce--sortie" : "")} role="status">
-      <div className="annonce__rayons" aria-hidden="true" />
-      <div className="annonce__confettis" aria-hidden="true">
-        {CONFETTIS.map((c, i) => (
-          <i
-            key={i}
-            className={`t${c.teinte}`}
-            style={
-              {
-                "--x": `${c.x}%`,
-                "--delai": `${c.delai}s`,
-                "--duree": `${c.duree}s`,
-                "--taille": `${c.taille}px`,
-                "--rot": `${c.rot}deg`,
-              } as React.CSSProperties
-            }
-          />
-        ))}
-      </div>
-
       {annonce.type === "mise" ? (
         <div className="annonce__carte" key={annonce.id}>
           {annonce.image && <Visuel lot={annonce} className="annonce__visuel" />}
           <p className="annonce__surtitre">Nouvelle mise</p>
           <h2 className="annonce__titre">{annonce.titre}</h2>
           <Montant valeur={annonce.mise} depart={annonce.ancien} className="annonce__montant" />
-          <p className="annonce__hausse">+ {argent(annonce.mise - annonce.ancien)}</p>
+          <p className="annonce__hausse">
+            + {argent(annonce.mise - annonce.ancien)}
+            <span>auparavant {argent(annonce.ancien)}</span>
+          </p>
         </div>
       ) : (
         <div className="annonce__carte annonce__carte--palier" key={annonce.id}>
-          <p className="annonce__surtitre">Nous venons de franchir</p>
+          <p className="annonce__surtitre">Le total de l’encan franchit</p>
           <Montant valeur={annonce.montant} depart={Math.max(0, annonce.montant - PALIER)} className="annonce__montant" />
           <p className="annonce__merci">Merci, pour Clément</p>
         </div>
