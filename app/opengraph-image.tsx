@@ -21,7 +21,10 @@ export default async function Image() {
     readFile(join(process.cwd(), "assets/polices/CormorantGaramond-MediumItalic.ttf")),
     readFile(join(process.cwd(), "assets/polices/Lato-Regular.ttf")),
     readFile(join(process.cwd(), "assets/polices/Lato-Bold.ttf")),
-    readFile(join(process.cwd(), "public/images/clement-portrait.jpg")),
+    // Copie dans assets/ et non lue dans public/ : tout fichier de public/ lu
+    // ici serait copié seul dans le serveur, et Firebase App Hosting sauterait
+    // alors la copie du vrai dossier public/ (vidéos et logos en 404).
+    readFile(join(process.cwd(), "assets/clement-partage.jpg")),
   ]);
   const photoSrc = `data:image/jpeg;base64,${photo.toString("base64")}`;
   const { evenement } = CONFIG;
