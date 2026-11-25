@@ -204,9 +204,15 @@ function FicheLot({
         aria-label={lot.titre}
         data-lenis-prevent
       >
-        {lot.image && (
+        {(lot.imageFiche || lot.image) && (
           <div className="modal__image">
-            <ImageLot src={lot.image} alt="" cadrage={lot.cadrage} sizes="520px" immediat />
+            <ImageLot
+              src={lot.imageFiche || lot.image}
+              alt=""
+              cadrage={lot.imageFiche ? lot.cadrageFiche : lot.cadrage}
+              sizes="520px"
+              immediat
+            />
           </div>
         )}
         <div className="modal__head">

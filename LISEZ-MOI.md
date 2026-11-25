@@ -192,7 +192,7 @@ côté 30 minutes. S’il abandonne, elles se libèrent toutes seules. Une fois 
 billets vendus, la billetterie affiche « complet ». Le nombre se change dans
 `lib/donnees.ts`, section `billet` (`limite`).
 
-**Le reçu fiscal :** 40 $ par billet (`montantRecuParBillet` dans `lib/donnees.ts`), plus le don supplémentaire. Il n’est
+**Le reçu fiscal :** 45 $ par billet (confirmé par la Fondation) (`montantRecuParBillet` dans `lib/donnees.ts`), plus le don supplémentaire. Il n’est
 **pas** émis par le site : la Fondation En Cœur l’émet **après la soirée**, une fois
 les fonds remis. Dans l’espace privé, la page **« Billets et reçus »** donne la liste
 à lui transmettre (nom, adresse, montant), avec un bouton **Exporter les reçus
@@ -286,7 +286,7 @@ npm run build
 - **Le logo de la Fondation En Cœur** apparaît sur toutes les pages : confirme avec la
   Fondation que tu peux l’utiliser ainsi.
 - **La mention sur les reçus fiscaux**, page « Faire un don », est volontairement
-  prudente. Ajuste-la selon ce que la Fondation te confirmera.
+  prudente. Ajuste-la selon ce que la Fondation te confirmera. (Billets : 45 $ par billet, confirmé.)
 - **L’heure (accueil 17 h, souper 18 h 30) est confirmée ; l’adresse de l’hôtel** reste une supposition.
   Corrige-la dans `lib/donnees.ts`.
 - **Firebase** : les quatre étapes d’activation plus haut, et les variables du

@@ -19,6 +19,7 @@ export default function FormLot({
     message ? { ok: true, message } : null
   );
   const [cadrage, setCadrage] = useState(lot?.cadrage ?? "entier");
+  const [cadrageFiche, setCadrageFiche] = useState(lot?.cadrageFiche ?? "remplir");
 
   return (
     // Envoi par onSubmit plutôt que action={…} : React viderait sinon le
@@ -103,9 +104,10 @@ export default function FormLot({
           </label>
         </div>
 
+        <div className="adm-pile" style={{ gap: "2rem", alignContent: "start" }}>
         <ChampImage
           nom="image"
-          libelle="Image du lot"
+          libelle="Image sur la page de l’encan"
           actuelle={lot?.image}
           forme="photo"
           remplir={cadrage === "remplir"}
@@ -140,6 +142,43 @@ export default function FormLot({
             </label>
           </fieldset>
         </ChampImage>
+
+        <ChampImage
+          nom="imageFiche"
+          libelle="Image dans « Voir le lot » (facultatif)"
+          actuelle={lot?.imageFiche}
+          forme="photo"
+          remplir={cadrageFiche === "remplir"}
+        >
+          <p className="adm-discret">
+            Ex. : le logo sur la page de l’encan, la photo du produit ici. Sans image, la fiche
+            reprend celle de la page de l’encan.
+          </p>
+          <fieldset className="adm-choix">
+            <legend className="adm-champ__libelle">Affichage dans la fiche</legend>
+            <label className="adm-case">
+              <input
+                type="radio"
+                name="cadrageFiche"
+                value="entier"
+                checked={cadrageFiche === "entier"}
+                onChange={() => setCadrageFiche("entier")}
+              />
+              <span>Montrer l’image en entier</span>
+            </label>
+            <label className="adm-case">
+              <input
+                type="radio"
+                name="cadrageFiche"
+                value="remplir"
+                checked={cadrageFiche === "remplir"}
+                onChange={() => setCadrageFiche("remplir")}
+              />
+              <span>Remplir le cadre</span>
+            </label>
+          </fieldset>
+        </ChampImage>
+        </div>
       </div>
 
       <div className="adm-form__pied">

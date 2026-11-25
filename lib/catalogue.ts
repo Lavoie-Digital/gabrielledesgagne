@@ -57,6 +57,8 @@ function versLot(id: string, d: Record<string, unknown>): LotFiche {
     nbMises: nombre(d.nbMises),
     image: texte(d.image),
     cadrage: d.cadrage === "remplir" ? "remplir" : "entier",
+    imageFiche: texte(d.imageFiche),
+    cadrageFiche: d.cadrageFiche === "entier" ? "entier" : "remplir",
     lienMise: texte(d.lienMise),
     descriptionEntreprise: texte(d.descriptionEntreprise),
     siteEntreprise: texte(d.siteEntreprise),

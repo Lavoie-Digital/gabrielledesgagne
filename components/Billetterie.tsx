@@ -115,7 +115,7 @@ export default function Billetterie({ restantes, ouverte }: { restantes: number 
         <span>
           <b>Je souhaite un reçu fiscal</b>
           <small>
-            Montant du reçu à venir. Le reçu est émis par la Fondation
+            {argent(CONFIG.billet.montantRecuParBillet)} par billet, plus le don supplémentaire. Le reçu est émis par la Fondation
             En Cœur <b>après la soirée</b>, une fois les fonds remis : vous ne le recevrez donc
             pas tout de suite.
           </small>

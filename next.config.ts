@@ -16,8 +16,9 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      // Les images envoyées depuis l’espace privé : 8 Mo, plus l’enveloppe du formulaire
-      bodySizeLimit: "10mb",
+      // Les images envoyées depuis l’espace privé : jusqu’à deux de 8 Mo
+      // (fiche d’un lot), plus l’enveloppe du formulaire
+      bodySizeLimit: "18mb",
     },
   },
 };

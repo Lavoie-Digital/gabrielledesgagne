@@ -175,6 +175,7 @@ export async function enregistrerLot(_: Retour, f: FormData): Promise<Retour> {
     descriptionEntreprise: champ(f, "descriptionEntreprise"),
     siteEntreprise: champ(f, "siteEntreprise"),
     cadrage: champ(f, "cadrage") === "remplir" ? "remplir" : "entier",
+    cadrageFiche: champ(f, "cadrageFiche") === "entier" ? "entier" : "remplir",
     ordre: montant(f, "ordre"),
   };
 
@@ -203,8 +204,9 @@ export async function enregistrerLot(_: Retour, f: FormData): Promise<Retour> {
     const avant = id ? await ref.get() : null;
     if (id && !avant?.exists) return { ok: false, message: "Ce lot n’existe plus." };
     const image = await imageDuFormulaire(f, "image", String(avant?.get("image") ?? ""), `lots/${ref.id}`);
+    const imageFiche = await imageDuFormulaire(f, "imageFiche", String(avant?.get("imageFiche") ?? ""), `lots/${ref.id}`);
     if (!id && !lot.ordre) lot.ordre = await prochainOrdre("lots");
-    await ref.set({ ...lot, image, majLe: new Date() }, { merge: true });
+    await ref.set({ ...lot, image, imageFiche, majLe: new Date() }, { merge: true });
   } catch (e) {
     return { ok: false, message: e instanceof Error ? e.message : "Enregistrement impossible." };
   }
@@ -219,8 +221,10 @@ export async function supprimerLot(f: FormData) {
   const ref = db().collection("lots").doc(champ(f, "id"));
   const d = await ref.get();
   if (d.exists) {
-    const image = String(d.get("image") ?? "");
-    if (image) await effacerImage(image);
+    for (const cle of ["image", "imageFiche"]) {
+      const url = String(d.get(cle) ?? "");
+      if (url) await effacerImage(url);
+    }
     await ref.delete();
     publier();
   }

@@ -46,7 +46,8 @@ function courrielBillets(c: Commande) {
   const corporatif = c.typeAcheteur === "corporatif" && c.entreprise;
   const recu = c.recu
     ? blocRecu({
-        montant: "", // montant du reçu à venir : à confirmer avec la Fondation
+        montant: argent(c.montantRecu),
+        precision: `${argent(CONFIG.billet.montantRecuParBillet)} par billet${c.donExtra > 0 ? " + votre don" : ""}`,
         nom: c.nom,
         entreprise: corporatif ? c.entreprise : "",
         poste: c.poste,

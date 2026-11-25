@@ -107,7 +107,7 @@ export default async function Merci({ searchParams }: { searchParams: Promise<{ 
                   <div><dt>Dont don supplémentaire</dt><dd>{argent(commande.donExtra)}</dd></div>
                 )}
                 {commande.recu && (
-                  <div><dt>Reçu fiscal</dt><dd>Montant du reçu à venir</dd></div>
+                  <div><dt>Reçu fiscal</dt><dd>{argent(commande.montantRecu)}</dd></div>
                 )}
               </dl>
             </div>
@@ -115,7 +115,7 @@ export default async function Merci({ searchParams }: { searchParams: Promise<{ 
 
           {commande.recu && (
             <p className="don-merci-note">
-              <b>Votre reçu fiscal sera transmis après la soirée.</b> Le montant du reçu est à venir. Le reçu est émis par la Fondation En Cœur une
+              <b>Votre reçu fiscal sera transmis après la soirée.</b> Le reçu de {argent(commande.montantRecu)} ({argent(CONFIG.billet.montantRecuParBillet)} par billet{commande.donExtra > 0 ? ", plus votre don" : ""}) est émis par la Fondation En Cœur une
               fois les fonds remis, après la soirée du {dateSoiree()}
               {commande.typeAcheteur === "corporatif" && commande.entreprise ? `, au nom de ${commande.entreprise}` : ""}.
               Vous n’avez rien d’autre à faire d’ici là.

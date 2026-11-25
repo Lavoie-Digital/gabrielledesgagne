@@ -2,8 +2,8 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { attacherSession, DUREE_RESERVATION_MS, liberer, reserver } from "@/lib/billetterie";
-import { CONFIG } from "@/lib/donnees";
+import { attacherSession, DUREE_RESERVATION_MS, liberer, montantRecu, reserver } from "@/lib/billetterie";
+import { CONFIG, argent } from "@/lib/donnees";
 import { firebaseConfigure } from "@/lib/firebase-admin";
 import { lireDonateur, MESSAGE_CORPORATIF_INCOMPLET } from "@/lib/recu-fiscal";
 import { stripe, stripeConfigure } from "@/lib/stripe";
@@ -133,7 +133,7 @@ export async function passerAuPaiement(_: EtatPaiement, form: FormData): Promise
       custom_text: recu
         ? {
             submit: {
-              message: `Votre reçu fiscal (montant du reçu à venir) sera émis par la Fondation En Cœur après la soirée, au nom et à l’adresse indiqués ici${acheteur.entreprise ? ` (${acheteur.entreprise})` : ""}.`,
+              message: `Votre reçu fiscal de ${argent(montantRecu(qte, donExtra, true))} (${argent(CONFIG.billet.montantRecuParBillet)} par billet${donExtra > 0 ? " + votre don" : ""}) sera émis par la Fondation En Cœur après la soirée, au nom et à l’adresse indiqués ici${acheteur.entreprise ? ` (${acheteur.entreprise})` : ""}.`,
             },
           }
         : undefined,

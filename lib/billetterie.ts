@@ -104,7 +104,8 @@ function versCommande(id: string, d: FirebaseFirestore.DocumentData): Commande {
     qte: nombre(d.qte),
     donExtra: nombre(d.donExtra),
     recu: d.recu === true,
-    montantRecu: nombre(d.montantRecu),
+    // Recalculé à la lecture : suit toujours le montant par billet en vigueur
+    montantRecu: montantRecu(nombre(d.qte), nombre(d.donExtra), d.recu === true),
     typeAcheteur: d.typeAcheteur === "corporatif" ? "corporatif" : "personnel",
     entreprise: texte(d.entreprise),
     poste: texte(d.poste),

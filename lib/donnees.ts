@@ -69,7 +69,7 @@ export const CONFIG = {
     // Partie du billet admissible à un reçu fiscal (prix du billet moins la
     // valeur du repas et des consommations). Le reçu est émis par la
     // Fondation En Cœur après la soirée, une fois les fonds remis.
-    montantRecuParBillet: 40,
+    montantRecuParBillet: 45,
     // Montants proposés pour le don supplémentaire (en dollars)
     donsSuggeres: [25, 50, 100, 250],
   },
@@ -230,6 +230,10 @@ export type Lot = {
   // « entier » : l’image est toujours montrée au complet (logos, cartes-cadeaux)
   // « remplir » : l’image occupe tout le cadre, quitte à rogner les bords (photos)
   cadrage?: "entier" | "remplir";
+  // Image montrée dans la fiche « Voir le lot » (ex. : la photo du produit
+  // quand la carte montre le logo). Vide : la fiche reprend l’image de la carte.
+  imageFiche?: string;
+  cadrageFiche?: "entier" | "remplir";
   lienMise: string;
   // L’entreprise qui offre le lot : sa présentation et son site Web
   descriptionEntreprise?: string;
